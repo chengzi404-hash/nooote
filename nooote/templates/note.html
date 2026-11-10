@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}{{ note.id }} · Nooote{% endblock %}
+{% block body_class %}note-page{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='vendor/katex/katex.min.css') }}">
+{% endblock %}
+
+{% block content %}
+<header class="topbar">
+  <a class="brand" href="{{ url_for('notes.index') }}">Nooote</a>
+  <span class="note-id" title="{{ note.id }}">{{ note.id }}</span>
+  <div class="actions">
+    <span class="status" data-status data-state="saved">已保存</span>
+    <span class="saved-at">更新于 <time data-saved-at data-relative datetime="{{ note.updated_at|iso_utc }}">{{ note.updated_at|iso_utc }}</time></span>
+  </div>
+</header>
+
+<main class="workspace" data-note-id="{{ note.id }}"
+      data-lezer-src="{{ url_for('static', filename='vendor/lezer-checks.js') }}"
+      data-ruby-src="{{ url_for('static', filename='vendor/ruby-checks.js') }}"
+      data-mermaid-src="{{ url_for('static', filename='vendor/mermaid/mermaid.min.js') }}">
+  <section class="pane editor-pane">
+    <div class="pane-label" id="editor-label">编辑</div>
+    <textarea id="editor" aria-labelledby="editor-label" spellcheck="true"
+              placeholder="在这里写点什么…（Markdown / CommonMark）" autofocus>{{ note.content }}</textarea>
+  </section>
+  <section class="pane preview-pane">
+    <div class="pane-label">预览</div>
+    <article class="markdown" data-preview aria-label="Markdown 预览"></article>
+  </section>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='vendor/marked.min.js') }}" defer></script>
+<script src="{{ url_for('static', filename='vendor/purify.min.js') }}" defer></script>
+<script src="{{ url_for('static', filename='vendor/highlight.min.js') }}" defer></script>
+<script src="{{ url_for('static', filename='vendor/katex/katex.min.js') }}" defer></script>
+<script src="{{ url_for('static', filename='app.js') }}" defer></script>
+{% endblock %}

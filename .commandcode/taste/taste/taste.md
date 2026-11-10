@@ -1,0 +1,12 @@
+# Taste
+- Uses `uv` for Python project and dependency management (creates/syncs deps with `uv sync`, runs things via `uv run`). Confidence: 0.8
+- Prefers Flask as the Python web framework for small web apps. Confidence: 0.6
+- Extends the client-side bias to code analysis tooling: static checks/linting should be a browser JS script running over the rendered code blocks, not a server endpoint. Confidence: 0.6
+- Prefers client-side (browser) rendering for presentation concerns — markdown preview and code highlighting should run in JS libraries in the browser (e.g. marked / highlight.js) rather than server-rendered endpoints; the backend should stay thin (storage + JSON API) and server-side render endpoints can be removed. Confidence: 0.75
+- Communicates in Chinese and expects Chinese-language explanations, UI copy, and documentation. Confidence: 0.8
+- Gives very short, high-level feature requests (e.g. one sentence) and expects the agent to pick the implementation approach, wire it in, add tests/docs, and verify, rather than asking clarifying questions. Confidence: 0.75
+- Wants Markdown rendering to match GitHub's behavior ("what GFM supports"): GitHub-style alert cards, GFM task lists, and GitHub-like visual treatment of these constructs. Confidence: 0.55
+- Wants rich content rendered as a direct inline preview (e.g. Mermaid diagram code blocks turned into SVG in the preview), not as a separate view or export step. Confidence: 0.6
+- Third-party frontend libraries are vendored into `static/vendor/` with their LICENSE files and recorded in a vendor README table (marked, highlight.js, DOMPurify, KaTeX, Mermaid, Lezer), rather than loaded from CDNs. Confidence: 0.6
+- Expects a repo to carry standard open-source GitHub infrastructure as a set, not ad hoc: `.gitignore`, `LICENSE`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, and "necessary" Issue/PR templates (form-style issue templates, PR template, blank issues disabled). Confidence: 0.55
+- Every new feature is expected to land as a complete change: implementation, README/user-facing docs, and pytest coverage, then verified in a real browser before being reported as done. Confidence: 0.65

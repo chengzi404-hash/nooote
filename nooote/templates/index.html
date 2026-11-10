@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block body_class %}home-page{% endblock %}
+
+{% block content %}
+<main class="home">
+  <header class="home-header">
+    <h1>Nooote</h1>
+    <p>打开一个链接，就能写一篇 Markdown 笔记。无需注册，自动保存。</p>
+  </header>
+
+  <form class="note-form" action="{{ url_for('notes.world_lookup') }}" method="get">
+    <label class="sr-only" for="note-id">笔记 ID</label>
+    <input id="note-id" name="id" type="text" maxlength="128" required autocomplete="off"
+           spellcheck="false" autofocus placeholder="输入笔记 ID，例如 hello-world">
+    <button type="submit" class="btn primary">打开 / 新建</button>
+    <a class="btn ghost" href="{{ url_for('notes.note', note_id=random_id) }}">随机笔记</a>
+  </form>
+
+  {% if recent %}
+  <section class="recent" aria-labelledby="recent-title">
+    <h2 id="recent-title">最近更新</h2>
+    <ul>
+      {% for item in recent %}
+      <li>
+        <a href="{{ url_for('notes.note', note_id=item.id) }}">{{ item.id }}</a>
+        <time data-relative datetime="{{ item.updated_at|iso_utc }}">{{ item.updated_at|iso_utc }}</time>
+      </li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+
+  <footer class="home-footer">
+    支持 <a href="https://commonmark.org/" rel="noreferrer">CommonMark</a> · 编辑与预览双栏 · Ctrl / ⌘ + S 立即保存
+  </footer>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='app.js') }}" defer></script>
+{% endblock %}
