@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Shell(uv:*)",
-      "Shell(python -c \" import pathlib,re,sys root=pathlib.Path('.') pat=re.compile('[\\U0001F000-\\U0001FAFF\\u2600-\\u27BF\\u2B00-\\u2BFF\\uFE0F\\u2139\\u2757\\u2705\\u274C\\u26A0]') skip={'.git','.venv','__pycache__','node_modules','vendor','.pytest_cache'} for p in root.rglob('*'): if not p.is_file(): continue if any(s in p.parts for s in skip): continue if p.suffix.lower() in {'.lock','.png','.jpg','.svg','.woff','.woff2','.ttf','.wasm','.ico'}: continue try: t=p.read_text(encoding='utf-8') except Exception: continue hits=[(i+1,l.strip()) for i,l in enumerate(t.splitlines()) if pat.search(l)] if hits: print('==',p) for n,l in hits[:40]: print(f'{n}: {l[:160]}') \")"
+      "Shell(python -c \" import pathlib,re,sys root=pathlib.Path('.') pat=re.compile('[\\U0001F000-\\U0001FAFF\\u2600-\\u27BF\\u2B00-\\u2BFF\\uFE0F\\u2139\\u2757\\u2705\\u274C\\u26A0]') skip={'.git','.venv','__pycache__','node_modules','vendor','.pytest_cache'} for p in root.rglob('*'): if not p.is_file(): continue if any(s in p.parts for s in skip): continue if p.suffix.lower() in {'.lock','.png','.jpg','.svg','.woff','.woff2','.ttf','.wasm','.ico'}: continue try: t=p.read_text(encoding='utf-8') except Exception: continue hits=[(i+1,l.strip()) for i,l in enumerate(t.splitlines()) if pat.search(l)] if hits: print('==',p) for n,l in hits[:40]: print(f'{n}: {l[:160]}') \")",
+      "powershell"
     ],
     "deny": [],
     "defaultMode": "default"

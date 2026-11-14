@@ -63,6 +63,9 @@ ID_GENERATION_ATTEMPTS = 10
 
 SECRET_KEY_BYTES = 32
 
+# SQLite: writers wait this long for a lock before raising "database is locked"
+SQLITE_BUSY_TIMEOUT_MS = 5000
+
 
 class Config:
     """Default Flask configuration applied by the application factory."""
