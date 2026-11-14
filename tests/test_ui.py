@@ -51,3 +51,26 @@ def test_code_copy_button_replaces_static_checks(client):
     assert ".code-copy" in css
     assert "lint-check" not in script
     assert ".lint-check" not in css
+
+
+def test_mermaid_blocks_toggle_between_diagram_and_code(client):
+    script = client.get("/static/app.js").get_data(as_text=True)
+    css = client.get("/static/style.css").get_data(as_text=True)
+
+    assert "mermaid-block" in script
+    assert "mermaid-toggle" in script
+    assert "toggleMermaidView" in script
+    assert "查看代码" in script
+    assert "查看图表" in script
+    assert ".mermaid-block" in css
+    assert ".mermaid-toggle" in css
+    assert '.mermaid-block[data-view="code"] .mermaid-source' in css
+
+
+def test_editor_and_preview_scroll_in_sync(client):
+    script = client.get("/static/app.js").get_data(as_text=True)
+
+    assert "syncScroll" in script
+    assert "scrollRatio" in script
+    assert 'textarea.addEventListener("scroll"' in script
+    assert 'preview.addEventListener("scroll"' in script

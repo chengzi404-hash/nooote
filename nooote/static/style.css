@@ -1905,6 +1905,62 @@ input[type="radio"]:focus-visible {
 
 /* ---------- Mermaid ---------- */
 
+.mermaid-block {
+  position: relative;
+}
+
+.mermaid-source,
+.mermaid-block[data-view="code"] .mermaid-diagram {
+  display: none;
+}
+
+.mermaid-block[data-view="code"] .mermaid-source {
+  display: block;
+}
+
+.mermaid-toggle {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 1px solid var(--line-strong);
+  border-radius: 0;
+  background: var(--panel);
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+}
+
+.mermaid-block:hover .mermaid-toggle,
+.mermaid-toggle:focus-visible,
+.mermaid-toggle[aria-pressed="true"] {
+  opacity: 1;
+}
+
+.mermaid-toggle:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.mermaid-block[data-view="code"] .code-copy {
+  right: 45px;
+}
+
+@media (hover: none) {
+  .mermaid-toggle {
+    opacity: 1;
+  }
+}
+
 .mermaid-diagram {
   margin: 0 0 1em;
   padding: 12px;

@@ -344,6 +344,10 @@
   }
 
   const MERMAID_LANGUAGES = new Set(["mermaid", "mmd"]);
+  const MERMAID_VIEW_ACTIONS = {
+    diagram: { icon: "code", label: "查看代码" },
+    code: { icon: "diagram-project", label: "查看图表" },
+  };
   const MERMAID_DARK_THEME = {
     background: "transparent",
     primaryColor: "#1f2a44",
@@ -474,29 +478,73 @@
       });
   }
 
+  function toggleMermaidView(block) {
+    const showCode = block.dataset.view !== "code";
+    block.dataset.view = showCode ? "code" : "diagram";
+
+    const action = MERMAID_VIEW_ACTIONS[block.dataset.view];
+    const button = block.querySelector(".mermaid-toggle");
+    if (!button) return;
+
+    button.replaceChildren(faIcon(action.icon));
+    button.title = action.label;
+    button.setAttribute("aria-label", action.label);
+    button.setAttribute("aria-pressed", showCode ? "true" : "false");
+  }
+
+  preview.addEventListener("click", (event) => {
+    const trigger = event.target.closest(".mermaid-toggle");
+    if (!trigger) return;
+
+    const block = trigger.closest(".mermaid-block");
+    if (block) toggleMermaidView(block);
+  });
+
+  function createMermaidBlock() {
+    const block = document.createElement("div");
+    block.className = "mermaid-block";
+    block.dataset.view = "diagram";
+
+    const container = document.createElement("div");
+    container.className = "mermaid-diagram";
+    container.dataset.state = "loading";
+
+    const placeholder = document.createElement("p");
+    placeholder.className = "mermaid-placeholder";
+    placeholder.textContent = "正在渲染图表…";
+    container.appendChild(placeholder);
+
+    const source = document.createElement("div");
+    source.className = "mermaid-source";
+
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "mermaid-toggle";
+    button.title = MERMAID_VIEW_ACTIONS.diagram.label;
+    button.setAttribute("aria-label", button.title);
+    button.setAttribute("aria-pressed", "false");
+    button.appendChild(faIcon(MERMAID_VIEW_ACTIONS.diagram.icon));
+
+    block.append(container, source, button);
+    return { block, container, source };
+  }
+
   function enhanceMermaidDiagrams() {
     let index = 0;
 
-    preview.querySelectorAll("pre code").forEach((block) => {
-      if (!MERMAID_LANGUAGES.has(languageOf(block))) return;
+    preview.querySelectorAll("pre code").forEach((codeBlock) => {
+      if (!MERMAID_LANGUAGES.has(languageOf(codeBlock))) return;
 
-      const pre = block.closest("pre");
+      const pre = codeBlock.closest("pre");
       if (!pre) return;
 
-      const code = block.textContent;
+      const code = codeBlock.textContent;
       const key = `${isDarkTheme() ? "dark" : "light"}:${index}:${code}`;
       index += 1;
 
-      const container = document.createElement("div");
-      container.className = "mermaid-diagram";
-      container.dataset.state = "loading";
-
-      const placeholder = document.createElement("p");
-      placeholder.className = "mermaid-placeholder";
-      placeholder.textContent = "正在渲染图表…";
-      container.appendChild(placeholder);
-
-      pre.replaceWith(container);
+      const { block, container, source } = createMermaidBlock();
+      pre.replaceWith(block);
+      source.appendChild(pre);
 
       const cached = mermaidCache.get(key);
       if (cached) {
@@ -509,8 +557,48 @@
     });
   }
 
+  const SCROLL_SYNC_MIN_WIDTH = 821;
+  let scrollSyncLock = null;
+
+  function scrollRatio(element) {
+    const range = element.scrollHeight - element.clientHeight;
+    return range > 0 ? element.scrollTop / range : 0;
+  }
+
+  function applyScrollRatio(target, ratio) {
+    const range = target.scrollHeight - target.clientHeight;
+    if (range > 0) target.scrollTop = ratio * range;
+  }
+
+  function syncScroll(source, target) {
+    if (window.innerWidth < SCROLL_SYNC_MIN_WIDTH) return;
+
+    if (scrollSyncLock) {
+      const fromTarget = scrollSyncLock.element === source;
+      const echoed = Math.abs(source.scrollTop - scrollSyncLock.top) <= 1;
+      scrollSyncLock = null;
+      if (fromTarget && echoed) return;
+    }
+
+    if (target.scrollHeight - target.clientHeight <= 0) return;
+
+    const ratio = scrollRatio(source);
+    const expected = ratio * (target.scrollHeight - target.clientHeight);
+    if (Math.abs(target.scrollTop - expected) <= 1) return;
+
+    scrollSyncLock = { element: target, top: expected };
+    applyScrollRatio(target, ratio);
+  }
+
+  if (textarea) {
+    textarea.addEventListener("scroll", () => syncScroll(textarea, preview), { passive: true });
+    preview.addEventListener("scroll", () => syncScroll(preview, textarea), { passive: true });
+  }
+
   function renderPreview() {
     if (!canRender) return;
+
+    const ratio = textarea ? scrollRatio(textarea) : 0;
 
     const rawHtml = marked.parse(sourceText(), {
       gfm: true,
@@ -526,6 +614,8 @@
     enhanceMermaidDiagrams();
     highlightCodeBlocks();
     addCopyButtons();
+
+    if (textarea) applyScrollRatio(preview, ratio);
   }
 
   function schedulePreview() {
