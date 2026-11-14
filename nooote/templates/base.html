@@ -8,6 +8,8 @@
   <meta name="theme-color" content="#0e0e12" media="(prefers-color-scheme:dark)">
   <title>{% block title %}Nooote{% endblock %}</title>
   <link rel="icon" href="{{ url_for('static', filename='favicon.svg') }}" type="image/svg+xml">
+  <link rel="stylesheet" href="{{ url_for('static', filename='vendor/fontawesome/css/fontawesome.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='vendor/fontawesome/css/solid.min.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   {% if theme == 'dark' %}
   <link rel="stylesheet" href="{{ url_for('static', filename='vendor/github-dark.min.css') }}">

@@ -16,6 +16,7 @@ from .config import (
 )
 from .extensions import db
 from .models import User, iso_utc
+from .vendor import sync_app as sync_vendor_assets
 
 
 def _load_or_create_secret(instance_path: str) -> str:
@@ -104,6 +105,9 @@ def create_app(test_config: dict | None = None) -> Flask:
         else:
             app.config["SECRET_KEY"] = _load_or_create_secret(app.instance_path)
 
+    if not app.config.get("TESTING"):
+        sync_vendor_assets(app)
+
     db.init_app(app)
 
     from .blueprints import register_blueprints
@@ -129,7 +133,7 @@ def create_app(test_config: dict | None = None) -> Flask:
             "Content-Security-Policy",
             "default-src 'self'; img-src 'self' data: https:; "
             "style-src 'self' 'unsafe-inline'; font-src 'self'; "
-            "script-src 'self' 'wasm-unsafe-eval'; connect-src 'self'; "
+            "script-src 'self'; connect-src 'self'; "
             "frame-ancestors 'none'; base-uri 'none'",
         )
         return response

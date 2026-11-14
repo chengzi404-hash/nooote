@@ -40,3 +40,14 @@ def test_styles_define_focus_and_page_motion(client):
     assert "@keyframes focus-ring" in css
     assert "@view-transition" in css
     assert "@keyframes page-in" in css
+
+
+def test_code_copy_button_replaces_static_checks(client):
+    script = client.get("/static/app.js").get_data(as_text=True)
+    css = client.get("/static/style.css").get_data(as_text=True)
+
+    assert "code-copy" in script
+    assert "addCopyButtons" in script
+    assert ".code-copy" in css
+    assert "lint-check" not in script
+    assert ".lint-check" not in css

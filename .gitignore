@@ -27,10 +27,6 @@ htmlcov/
 .env.*
 !.env.example
 
-# Node tooling for rebuilding browser check bundles (tools/checks)
-node_modules/
-npm-debug.log*
-
 # Editors and OS files
 .idea/
 .vscode/
@@ -38,5 +34,9 @@ npm-debug.log*
 .DS_Store
 Thumbs.db
 
-# Vendor
+# Vendor: third-party browser libraries are downloaded at startup (nooote/vendor.py).
+# Keep the license inventory under version control.
 vendor/
+!nooote/static/vendor/
+nooote/static/vendor/*
+!nooote/static/vendor/README.md

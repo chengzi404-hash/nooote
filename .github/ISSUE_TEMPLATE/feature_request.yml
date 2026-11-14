@@ -37,7 +37,7 @@ body:
       options:
         - 编辑与自动保存
         - Markdown 预览
-        - 代码高亮与静态检查
+        - 代码高亮与复制
         - Mermaid / KaTeX
         - 首页与导航
         - 部署与配置

@@ -201,8 +201,6 @@ def test_note_page_loads_client_renderers(auth_client):
     assert "vendor/katex/katex.min.js" in page
     assert "vendor/katex/katex.min.css" in page
     assert "vendor/mermaid/mermaid.min.js" in page
-    assert "vendor/lezer-checks.js" in page
-    assert "vendor/ruby-checks.js" in page
     assert "static/app.js" in page
 
 
@@ -224,19 +222,26 @@ def test_vendor_assets_are_served(client):
         "marked.min.js",
         "purify.min.js",
         "highlight.min.js",
-        "lezer-checks.js",
-        "ruby-checks.js",
-        "prism.wasm",
         "katex/katex.min.js",
         "katex/katex.min.css",
         "katex/fonts/KaTeX_Main-Regular.woff2",
         "mermaid/mermaid.min.js",
+        "fontawesome/css/fontawesome.min.css",
+        "fontawesome/css/solid.min.css",
+        "fontawesome/webfonts/fa-solid-900.woff2",
         "github.min.css",
         "github-dark.min.css",
     ):
         response = client.get(f"/static/vendor/{name}")
         assert response.status_code == 200
         assert response.data
+
+
+def test_pages_load_fontawesome_icons(client):
+    page = client.get("/").get_data(as_text=True)
+
+    assert "vendor/fontawesome/css/fontawesome.min.css" in page
+    assert "vendor/fontawesome/css/solid.min.css" in page
 
 
 def test_markdown_extra_styles_are_present(client):
@@ -319,7 +324,6 @@ def test_security_headers(client):
     assert response.headers["X-Content-Type-Options"] == "nosniff"
     assert response.headers["X-Frame-Options"] == "DENY"
     assert "Content-Security-Policy" in response.headers
-    assert "wasm-unsafe-eval" in response.headers["Content-Security-Policy"]
     assert "style-src 'self' 'unsafe-inline'" in response.headers["Content-Security-Policy"]
     assert "font-src 'self'" in response.headers["Content-Security-Policy"]
 

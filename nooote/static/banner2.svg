@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 640" width="1600" height="640" role="img" aria-label="Nooote banner artwork with NOOOTE PROJECT wordmark">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#08090d"/>
+      <stop offset=".55" stop-color="#0d0f16"/>
+      <stop offset="1" stop-color="#151724"/>
+    </linearGradient>
+    <linearGradient id="edge" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#3d5bff" stop-opacity=".9"/>
+      <stop offset="1" stop-color="#8ea2ff" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="warm" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ff8a4c"/>
+      <stop offset="1" stop-color="#ffb27a"/>
+    </linearGradient>
+    <radialGradient id="glowBlue" cx=".5" cy=".5" r=".5">
+      <stop offset="0" stop-color="#3d5bff" stop-opacity=".5"/>
+      <stop offset="1" stop-color="#3d5bff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowWarm" cx=".5" cy=".5" r=".5">
+      <stop offset="0" stop-color="#ff8a4c" stop-opacity=".32"/>
+      <stop offset="1" stop-color="#ff8a4c" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0H0v48" fill="none" stroke="#ffffff" stroke-opacity=".045"/>
+    </pattern>
+    <pattern id="dots" width="20" height="20" patternUnits="userSpaceOnUse">
+      <circle cx="1.4" cy="1.4" r="1.4" fill="#ffffff" fill-opacity=".14"/>
+    </pattern>
+  </defs>
+
+  <rect width="1600" height="640" fill="url(#bg)"/>
+  <rect width="1600" height="640" fill="url(#grid)"/>
+  <circle cx="1240" cy="160" r="460" fill="url(#glowBlue)"/>
+  <circle cx="1460" cy="580" r="340" fill="url(#glowWarm)"/>
+
+  <rect x="64" y="392" width="360" height="128" fill="url(#dots)" opacity=".5"/>
+  <path d="M64 352h300" stroke="url(#edge)" stroke-width="1.5"/>
+  <path d="M64 368h140" stroke="#ffffff" stroke-opacity=".12"/>
+  <path d="M64 500h180" stroke="#ffffff" stroke-opacity=".08"/>
+
+  <path d="M112 214v250M112 214l186 250M298 214v250" fill="none" stroke="#ffffff" stroke-opacity=".07" stroke-width="3"/>
+
+  <rect x="352" y="188" width="14" height="14" fill="url(#warm)" opacity=".9"/>
+  <rect x="386" y="222" width="7" height="7" fill="#8ea2ff" opacity=".8"/>
+  <path d="M330 158h56" stroke="#8ea2ff" stroke-opacity=".5"/>
+  <circle cx="470" cy="286" r="4" fill="#ffffff" fill-opacity=".35"/>
+
+  <g transform="translate(64 96)">
+    <rect x="0" y="0" width="46" height="6" fill="url(#warm)"/>
+    <text y="82" font-family="Inter, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="68" font-weight="800" letter-spacing="12" fill="#ffffff">NOOOTE</text>
+    <text y="132" font-family="Inter, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="24" font-weight="600" letter-spacing="18" fill="#8ea2ff">PROJECT</text>
+  </g>
+
+  <g transform="translate(838 108) rotate(-6 260 240)">
+    <rect x="52" y="30" width="400" height="264" fill="#0f1118" stroke="#262a3a"/>
+    <rect x="26" y="56" width="432" height="284" fill="#12141d" stroke="#303549"/>
+    <g>
+      <rect x="0" y="84" width="468" height="312" fill="#171a25" stroke="#454b66"/>
+      <rect x="0" y="84" width="468" height="46" fill="#1d2132" stroke="#454b66"/>
+      <circle cx="28" cy="107" r="4.5" fill="#ff8a4c"/>
+      <circle cx="46" cy="107" r="4.5" fill="#3d5bff"/>
+      <circle cx="64" cy="107" r="4.5" fill="#4a4f66"/>
+      <rect x="30" y="162" width="236" height="16" fill="#8ea2ff"/>
+      <rect x="30" y="198" width="366" height="8" fill="#ffffff" fill-opacity=".18"/>
+      <rect x="30" y="218" width="322" height="8" fill="#ffffff" fill-opacity=".13"/>
+      <rect x="30" y="238" width="344" height="8" fill="#ffffff" fill-opacity=".1"/>
+      <rect x="30" y="278" width="122" height="8" fill="#ff8a4c" fill-opacity=".85"/>
+      <rect x="30" y="300" width="262" height="8" fill="#ffffff" fill-opacity=".13"/>
+      <rect x="30" y="320" width="218" height="8" fill="#ffffff" fill-opacity=".1"/>
+      <rect x="30" y="350" width="82" height="26" fill="#3d5bff"/>
+      <rect x="124" y="350" width="82" height="26" fill="none" stroke="#5a6079"/>
+    </g>
+  </g>
+
+  <path d="M0 604h1600" stroke="#ffffff" stroke-opacity=".16"/>
+  <g fill="#ffffff" fill-opacity=".22">
+    <rect x="64" y="596" width="2" height="16"/>
+    <rect x="112" y="600" width="2" height="12"/>
+    <rect x="160" y="596" width="2" height="16"/>
+    <rect x="208" y="600" width="2" height="12"/>
+    <rect x="1536" y="596" width="2" height="16"/>
+  </g>
+  <rect x="0" y="0" width="1600" height="640" fill="none" stroke="#ffffff" stroke-opacity=".06"/>
+</svg>

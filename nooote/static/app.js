@@ -1,6 +1,14 @@
 (() => {
   "use strict";
 
+  function faIcon(name, label, extraClass) {
+    const icon = document.createElement("i");
+    icon.className = `fa-solid fa-${name}${extraClass ? ` ${extraClass}` : ""}`;
+    icon.setAttribute("aria-hidden", "true");
+    if (label) icon.title = label;
+    return icon;
+  }
+
   const relativeFormatter = typeof Intl !== "undefined" && Intl.RelativeTimeFormat
     ? new Intl.RelativeTimeFormat("zh-CN", { numeric: "auto" })
     : null;
@@ -167,58 +175,6 @@
     });
   }
 
-  const MAX_CHECK_ERRORS = 20;
-
-  const CHECKERS = {
-    javascript: { label: "JavaScript", parser: "javascript", source: "Lezer" },
-    python: { label: "Python", parser: "python", source: "Lezer" },
-    c: { label: "C", parser: "cpp", source: "Lezer" },
-    cpp: { label: "C++", parser: "cpp", source: "Lezer" },
-    rust: { label: "Rust", parser: "rust", source: "Lezer" },
-    html: { label: "HTML", parser: "html", source: "Lezer" },
-    css: { label: "CSS", parser: "css", source: "Lezer" },
-    json: { label: "JSON", parser: "json", source: "Lezer" },
-    java: { label: "Java", parser: "java", source: "Lezer" },
-    php: { label: "PHP", parser: "php", source: "Lezer" },
-    go: { label: "Go", parser: "go", source: "Lezer" },
-    yaml: { label: "YAML", parser: "yaml", source: "Lezer" },
-    ruby: { label: "Ruby", checker: "ruby", source: "Prism" },
-  };
-
-  const LANGUAGE_ALIASES = {
-    js: "javascript",
-    javascript: "javascript",
-    mjs: "javascript",
-    cjs: "javascript",
-    node: "javascript",
-    py: "python",
-    python: "python",
-    c: "c",
-    h: "c",
-    cpp: "cpp",
-    "c++": "cpp",
-    cc: "cpp",
-    cxx: "cpp",
-    hpp: "cpp",
-    hxx: "cpp",
-    rs: "rust",
-    rust: "rust",
-    rb: "ruby",
-    ruby: "ruby",
-    html: "html",
-    htm: "html",
-    css: "css",
-    json: "json",
-    java: "java",
-    php: "php",
-    go: "go",
-    golang: "go",
-    yml: "yaml",
-    yaml: "yaml",
-  };
-
-  const checkModulePromises = new Map();
-
   function setStatus(text, state) {
     if (!statusEl) return;
     statusEl.textContent = text;
@@ -251,223 +207,78 @@
     });
   }
 
-  function lineStarts(code) {
-    const starts = [0];
-
-    for (let index = 0; index < code.length; index += 1) {
-      if (code.charCodeAt(index) === 10) starts.push(index + 1);
+  async function copyText(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text);
+      return;
     }
 
-    return starts;
+    const fallback = document.createElement("textarea");
+    fallback.value = text;
+    fallback.setAttribute("readonly", "");
+    fallback.style.position = "fixed";
+    fallback.style.opacity = "0";
+    document.body.appendChild(fallback);
+    fallback.select();
+    document.execCommand("copy");
+    fallback.remove();
   }
 
-  function positionAt(starts, offset) {
-    let low = 0;
-    let high = starts.length - 1;
+  const COPY_RESET_MS = 1500;
 
-    while (low < high) {
-      const middle = Math.ceil((low + high) / 2);
-      if (starts[middle] <= offset) low = middle;
-      else high = middle - 1;
-    }
-
-    return { line: low + 1, column: offset - starts[low] + 1 };
-  }
-
-  function loadCheckModule(kind) {
-    if (!checkModulePromises.has(kind)) {
-      const url = kind === "ruby"
-        ? workspace.dataset.rubySrc
-        : workspace.dataset.lezerSrc;
-
-      const promise = import(url).catch((error) => {
-        checkModulePromises.delete(kind);
-        throw error;
-      });
-
-      checkModulePromises.set(kind, promise);
-    }
-
-    return checkModulePromises.get(kind);
-  }
-
-  function checkWithLezer(parser, code) {
-    const tree = parser.parse(code);
-    const starts = lineStarts(code);
-    const seen = new Set();
-    const errors = [];
-
-    tree.iterate({
-      enter(node) {
-        if (!node.type.isError) return true;
-
-        const position = positionAt(starts, node.from);
-        const rawSnippet = code.slice(node.from, node.to).replace(/\s+/g, " ").trim();
-        const snippet = rawSnippet.length > 60
-          ? `${rawSnippet.slice(0, 60)}…`
-          : rawSnippet;
-        const key = `${position.line}:${position.column}:${snippet}`;
-
-        if (!seen.has(key) && errors.length < MAX_CHECK_ERRORS) {
-          seen.add(key);
-          errors.push({
-            line: position.line,
-            column: position.column,
-            reason: snippet ? `语法错误：${snippet}` : "语法错误：缺少必要的语法元素",
-            code: "syntax",
-          });
-        }
-
-        return false;
-      },
-    });
-
-    return errors;
-  }
-
-  async function checkCode(language, code) {
-    const config = CHECKERS[language];
-
-    if (config.checker === "ruby") {
-      const module = await loadCheckModule("ruby");
-      return module.checkRuby(code);
-    }
-
-    const module = await loadCheckModule("lezer");
-    const parser = module.parsers[config.parser];
-    if (!parser) throw new Error(`缺少 ${config.label} 解析器`);
-
-    return checkWithLezer(parser, code);
-  }
-
-  function createLintUi(block, metaLabel) {
+  function createCopyButton(block) {
     const pre = block.closest("pre");
-    if (!pre || !pre.parentNode) return null;
+    if (!pre || !pre.parentNode) return;
 
     const wrapper = document.createElement("div");
     wrapper.className = "code-block";
     pre.parentNode.insertBefore(wrapper, pre);
     wrapper.appendChild(pre);
 
-    const details = document.createElement("details");
-    details.className = "lint-check";
-    details.dataset.state = "checking";
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "code-copy";
+    button.title = "复制代码";
+    button.setAttribute("aria-label", button.title);
+    button.appendChild(faIcon("copy"));
 
-    const summary = document.createElement("summary");
-    summary.textContent = "⏳";
-    summary.title = "正在检查代码…";
-    summary.setAttribute("aria-label", summary.title);
+    let resetTimer = null;
 
-    const panel = document.createElement("div");
-    panel.className = "lint-details";
-
-    const heading = document.createElement("p");
-    heading.className = "lint-heading";
-    heading.textContent = "正在检查…";
-
-    const meta = document.createElement("p");
-    meta.className = "lint-meta";
-    meta.textContent = metaLabel;
-
-    panel.append(heading, meta);
-    details.append(summary, panel);
-    wrapper.appendChild(details);
-
-    return { details, summary, panel };
-  }
-
-  function updateLintUi(ui, errors, metaLabel) {
-    const passed = errors.length === 0;
-    const { details, summary, panel } = ui;
-
-    details.dataset.state = passed ? "pass" : "fail";
-    summary.textContent = passed ? "✅" : "❌";
-    summary.title = passed
-      ? "静态检查通过，点击查看详情"
-      : `发现 ${errors.length} 个问题，点击查看详情`;
-    summary.setAttribute("aria-label", summary.title);
-
-    const heading = document.createElement("p");
-    heading.className = "lint-heading";
-    heading.textContent = passed
-      ? "静态检查通过：未发现问题。"
-      : `静态检查发现 ${errors.length} 个问题：`;
-
-    panel.replaceChildren(heading);
-
-    if (!passed) {
-      const list = document.createElement("ol");
-      list.className = "lint-errors";
-
-      errors.forEach((error) => {
-        const item = document.createElement("li");
-
-        const location = document.createElement("span");
-        location.className = "lint-location";
-        location.textContent = `${error.line ?? "?"}:${error.column ?? "?"}`;
-
-        const reason = document.createElement("span");
-        reason.className = "lint-reason";
-        reason.textContent = error.reason || "无法解析的语法";
-
-        item.append(location, reason);
-
-        if (error.code) {
-          const code = document.createElement("code");
-          code.textContent = error.code;
-          item.appendChild(code);
-        }
-
-        list.appendChild(item);
-      });
-
-      panel.appendChild(list);
-    }
-
-    const meta = document.createElement("p");
-    meta.className = "lint-meta";
-    meta.textContent = metaLabel;
-    panel.appendChild(meta);
-  }
-
-  async function runStaticChecks() {
-    const blocks = Array.from(preview.querySelectorAll("pre code"));
-
-    await Promise.all(blocks.map(async (block) => {
-      if (block.dataset.lintChecked === "true") return;
-
-      const language = LANGUAGE_ALIASES[languageOf(block)];
-      if (!language) return;
-
-      block.dataset.lintChecked = "true";
-
-      const config = CHECKERS[language];
-      const metaLabel = `${config.source} · ${config.label}`;
-      const ui = createLintUi(block, metaLabel);
-      if (!ui) return;
-
+    button.addEventListener("click", async () => {
       try {
-        const errors = await checkCode(language, block.textContent);
-        if (!block.isConnected) return;
-        updateLintUi(ui, errors, metaLabel);
+        await copyText(block.textContent);
+        button.replaceChildren(faIcon("check"));
+        button.dataset.state = "copied";
+        button.title = "已复制";
+        button.setAttribute("aria-label", button.title);
       } catch (error) {
-        if (!block.isConnected) return;
-        updateLintUi(ui, [{
-          line: 0,
-          column: 0,
-          reason: `检查失败：${error.message}`,
-          code: "E000",
-        }], metaLabel);
+        button.dataset.state = "error";
+        button.title = "复制失败";
+        button.setAttribute("aria-label", button.title);
       }
-    }));
+
+      clearTimeout(resetTimer);
+      resetTimer = setTimeout(() => {
+        button.replaceChildren(faIcon("copy"));
+        delete button.dataset.state;
+        button.title = "复制代码";
+        button.setAttribute("aria-label", button.title);
+      }, COPY_RESET_MS);
+    });
+
+    wrapper.appendChild(button);
+  }
+
+  function addCopyButtons() {
+    preview.querySelectorAll("pre code").forEach(createCopyButton);
   }
 
   const ALERT_LABELS = {
-    note: { icon: "ℹ️", label: "注意" },
-    tip: { icon: "💡", label: "提示" },
-    important: { icon: "❗", label: "重要" },
-    warning: { icon: "⚠️", label: "警告" },
-    caution: { icon: "🛑", label: "谨慎" },
+    note: { icon: "circle-info", label: "注意" },
+    tip: { icon: "lightbulb", label: "提示" },
+    important: { icon: "circle-exclamation", label: "重要" },
+    warning: { icon: "triangle-exclamation", label: "警告" },
+    caution: { icon: "ban", label: "谨慎" },
   };
 
   const ALERT_MARKER = /^\s*\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]\s*/i;
@@ -505,7 +316,7 @@
 
       const title = document.createElement("p");
       title.className = "markdown-alert-title";
-      title.textContent = `${alertConfig.icon} ${alertConfig.label}`;
+      title.append(faIcon(alertConfig.icon, alertConfig.label), alertConfig.label);
       alert.appendChild(title);
 
       if (!first.textContent.trim() && first.children.length === 0) {
@@ -714,7 +525,7 @@
     enhanceTaskLists();
     enhanceMermaidDiagrams();
     highlightCodeBlocks();
-    runStaticChecks();
+    addCopyButtons();
   }
 
   function schedulePreview() {

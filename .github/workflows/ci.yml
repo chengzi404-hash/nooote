@@ -26,5 +26,8 @@ jobs:
       - name: Install dependencies
         run: uv sync --locked
 
+      - name: Download vendored browser libraries
+        run: uv run python -m nooote.vendor
+
       - name: Run tests
         run: uv run pytest
