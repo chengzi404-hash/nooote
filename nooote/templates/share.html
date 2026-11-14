@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+
+{% block title %}{{ note.id }} · 公开笔记 · Nooote{% endblock %}
+{% block body_class %}note-page share-page{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='vendor/katex/katex.min.css') }}">
+{% endblock %}
+
+{% block content %}
+<header class="topbar">
+  <a class="icon-btn" href="{{ url_for('public.index') }}" aria-label="返回首页" title="返回首页">{{ icon("arrow-left", 16) }}</a>
+  <a class="brand" href="{{ url_for('public.index') }}">
+    <span class="brand-mark">{{ icon("mark", 14) }}</span>
+    <span>Nooote</span>
+  </a>
+  <span class="crumb" aria-hidden="true">/</span>
+  <span class="note-id" title="{{ note.id }}">{{ note.id }}</span>
+  <span class="badge public">公开 · 只读</span>
+  <div class="actions">
+    <span class="saved-at">更新于 <time data-relative datetime="{{ note.updated_at|iso_utc }}">{{ note.updated_at|iso_utc }}</time></span>
+    <button type="button" class="btn small subtle" data-copy="{{ url_for('public.share_note', note_id=note.id) }}">复制链接</button>
+  </div>
+</header>
+
+<main class="share-workspace" data-share-id="{{ note.id }}"
+      data-lezer-src="{{ url_for('static', filename='vendor/lezer-checks.js') }}"
+      data-ruby-src="{{ url_for('static', filename='vendor/ruby-checks.js') }}"
+      data-mermaid-src="{{ url_for('static', filename='vendor/mermaid/mermaid.min.js') }}">
+  <article class="markdown" data-preview aria-label="Markdown 预览"></article>
+</main>
+
+<textarea id="share-source" hidden>{{ note.content }}</textarea>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='vendor/marked.min.js') }}" defer></script>
+<script src="{{ url_for('static', filename='vendor/purify.min.js') }}" defer></script>
+<script src="{{ url_for('static', filename='vendor/highlight.min.js') }}" defer></script>
+<script src="{{ url_for('static', filename='vendor/katex/katex.min.js') }}" defer></script>
+<script src="{{ url_for('static', filename='app.js') }}" defer></script>
+{% endblock %}

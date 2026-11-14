@@ -1,0 +1,87 @@
+{% extends "console_base.html" %}
+{% from "_icons.html" import icon %}
+
+{% block title %}我的控制台 · Nooote{% endblock %}
+{% block crumb %}我的笔记{% endblock %}
+
+{% block console_content %}
+<header class="console-header">
+  <div>
+    <p class="eyebrow">Workspace</p>
+    <h1>{% if current_user.display_name %}{{ current_user.display_name }} 的笔记{% else %}我的笔记{% endif %}</h1>
+    <p>
+      共 {{ stats.total }} 篇笔记，其中 {{ stats.public }} 篇已公开。私有笔记只有你能看到；
+      公开后可在 <code>/share/&lt;id&gt;</code> 只读访问，编辑私有笔记会自动同步。
+    </p>
+  </div>
+  <form method="post" action="{{ url_for('console.create_note') }}">
+    <button type="submit" class="btn primary">{{ icon("plus", 15) }} 新建私有笔记</button>
+  </form>
+</header>
+
+<section class="stat-grid" aria-label="笔记统计">
+  <div class="stat">
+    <span>全部笔记</span>
+    <strong>{{ stats.total }}</strong>
+  </div>
+  <div class="stat">
+    <span>私有</span>
+    <strong>{{ stats.private }}</strong>
+  </div>
+  <div class="stat">
+    <span>公开</span>
+    <strong>{{ stats.public }}</strong>
+  </div>
+  <div class="stat">
+    <span>附件</span>
+    <strong>{{ stats.attachments }}</strong>
+  </div>
+</section>
+
+{% if notes %}
+<ul class="note-list">
+  {% for item in notes %}
+  {% set plain = item.content.strip() %}
+  {% set first_line = plain.split('\n')[0] if plain else '' %}
+  <li class="note-row">
+    <div class="note-main">
+      <a class="note-title" href="{{ url_for('console.edit_note', note_id=item.id) }}">
+        {{ first_line[:64] if first_line else "空白笔记" }}
+      </a>
+      <span class="note-meta">
+        <code>{{ item.id }}</code>
+        <span aria-hidden="true">·</span>
+        更新于 <time data-relative datetime="{{ item.updated_at|iso_utc }}">{{ item.updated_at|iso_utc }}</time>
+      </span>
+    </div>
+    <div class="note-actions">
+      {% if item.is_public %}
+      <a class="badge public" href="{{ url_for('public.share_note', note_id=item.id) }}" target="_blank" rel="noreferrer">公开 · 只读</a>
+      <form method="post" action="{{ url_for('console.unpublish_note', note_id=item.id) }}">
+        <button type="submit" class="btn small subtle">取消公开</button>
+      </form>
+      {% else %}
+      <span class="badge private">私有</span>
+      <form method="post" action="{{ url_for('console.publish_note', note_id=item.id) }}">
+        <button type="submit" class="btn small subtle">公开</button>
+      </form>
+      {% endif %}
+      <a class="btn small outline" href="{{ url_for('console.edit_note', note_id=item.id) }}">编辑</a>
+      <form method="post" action="{{ url_for('console.delete_note', note_id=item.id) }}"
+            data-confirm="删除后无法恢复，确定删除这篇笔记吗？">
+        <button type="submit" class="btn small danger">删除</button>
+      </form>
+    </div>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<div class="console-empty">
+  <p class="console-empty-title">还没有笔记</p>
+  <p>点击侧边栏的「新建私有笔记」，从第一行开始写起。</p>
+  <form method="post" action="{{ url_for('console.create_note') }}">
+    <button type="submit" class="btn primary">{{ icon("plus", 15) }} 新建私有笔记</button>
+  </form>
+</div>
+{% endif %}
+{% endblock %}

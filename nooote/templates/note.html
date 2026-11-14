@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+
+{% block title %}{{ note.id }} · 私有笔记 · Nooote{% endblock %}
+{% block body_class %}note-page{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='vendor/katex/katex.min.css') }}">
+{% endblock %}
+
+{% block content %}
+<header class="topbar">
+  <a class="icon-btn" href="{{ url_for('console.index') }}" aria-label="返回控制台" title="返回控制台">{{ icon("arrow-left", 16) }}</a>
+  <a class="brand" href="{{ url_for('public.index') }}">
+    <span class="brand-mark">{{ icon("mark", 14) }}</span>
+    <span>Nooote</span>
+  </a>
+  <span class="crumb" aria-hidden="true">/</span>
+  <span class="note-id" title="{{ note.id }}">{{ note.id }}</span>
+  {% if note.is_public %}
+  <span class="badge public">公开 · 只读</span>
+  {% else %}
+  <span class="badge private">私有</span>
+  {% endif %}
+
+  <div class="actions">
+    {% if note.is_public %}
+    <a class="btn small subtle note-public-link" href="{{ url_for('public.share_note', note_id=note.id) }}" target="_blank" rel="noreferrer">查看 {{ icon("external", 12) }}</a>
+    <button type="button" class="btn small subtle note-copy-link" data-copy="{{ url_for('public.share_note', note_id=note.id) }}">复制链接</button>
+    <form method="post" action="{{ url_for('console.unpublish_note', note_id=note.id) }}">
+      <button type="submit" class="btn small subtle">取消公开</button>
+    </form>
+    {% else %}
+    <form method="post" action="{{ url_for('console.publish_note', note_id=note.id) }}">
+      <button type="submit" class="btn small subtle">公开</button>
+    </form>
+    {% endif %}
+    <span class="status" data-status data-state="saved">已保存</span>
+    <span class="saved-at">更新于 <time data-saved-at data-relative datetime="{{ note.updated_at|iso_utc }}">{{ note.updated_at|iso_utc }}</time></span>
+  </div>
+</header>
+
+<main class="workspace" data-note-id="{{ note.id }}"
+      data-lezer-src="{{ url_for('static', filename='vendor/lezer-checks.js') }}"
+      data-ruby-src="{{ url_for('static', filename='vendor/ruby-checks.js') }}"
+      data-mermaid-src="{{ url_for('static', filename='vendor/mermaid/mermaid.min.js') }}">
+  <section class="pane editor-pane">
+    <div class="pane-label">
+      <span id="editor-label">编辑</span>
+      <span class="pane-tools">
+        <button type="button" class="btn small subtle" data-upload-trigger>{{ icon("image", 14) }} 上传图片/附件</button>
+        <input type="file" data-upload-input hidden multiple>
+      </span>
+    </div>
+    <textarea id="editor" aria-labelledby="editor-label" spellcheck="true"
+              placeholder="在这里写点什么…（Markdown / CommonMark），也可以拖入或粘贴图片" autofocus>{{ note.content }}</textarea>
+  </section>
+  <section class="pane preview-pane">
+    <div class="pane-label">预览</div>
+    <article class="markdown" data-preview aria-label="Markdown 预览"></article>
+  </section>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='vendor/marked.min.js') }}" defer></script>
+<script src="{{ url_for('static', filename='vendor/purify.min.js') }}" defer></script>
+<script src="{{ url_for('static', filename='vendor/highlight.min.js') }}" defer></script>
+<script src="{{ url_for('static', filename='vendor/katex/katex.min.js') }}" defer></script>
+<script src="{{ url_for('static', filename='app.js') }}" defer></script>
+{% endblock %}

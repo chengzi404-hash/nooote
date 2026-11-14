@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+
+{% block title %}Nooote · 轻量的在线 Markdown 笔记{% endblock %}
+{% block body_class %}home-page{% endblock %}
+
+{% block content %}
+<header class="site-header">
+  <div class="site-header-inner">
+    <a class="brand" href="{{ url_for('public.index') }}">
+      <span class="brand-mark">{{ icon("mark", 16) }}</span>
+      <span>Nooote</span>
+    </a>
+
+    <nav class="site-nav" aria-label="站点导航">
+      <a href="#features">功能</a>
+      <a href="#workflow">工作流</a>
+      <a href="#recent">公开笔记</a>
+    </nav>
+
+    <div class="site-actions">
+      {% if current_user %}
+      <span class="user-chip">{{ current_user.username }}</span>
+      <a class="btn small primary" href="{{ url_for('console.index') }}">进入我的控制台</a>
+      <form method="post" action="{{ url_for('auth.logout') }}">
+        <button type="submit" class="btn small subtle">退出登录</button>
+      </form>
+      {% else %}
+      <a class="btn small subtle" href="{{ url_for('auth.login') }}">登录</a>
+      <a class="btn small primary" href="{{ url_for('auth.register') }}">注册</a>
+      {% endif %}
+    </div>
+  </div>
+</header>
+
+<main class="home">
+  <section class="hero" aria-labelledby="hero-title">
+    <img class="hero-banner" src="{{ url_for('static', filename='banner.svg') }}"
+         alt="" width="1600" height="640" fetchpriority="high">
+    <div class="hero-overlay" aria-hidden="true"></div>
+    <div class="hero-inner">
+      <p class="eyebrow">开源 · Flask · CommonMark</p>
+      <h1 id="hero-title">把想法写成笔记，<br><span class="hero-accent">让它在线上生长。</span></h1>
+      <p class="hero-lead">
+        Nooote 是一个轻量的在线 Markdown 笔记应用。登录后拥有自己的私有笔记空间，
+        输入停顿即自动保存；需要分享时，一条只读链接就够了。
+      </p>
+      <div class="hero-actions">
+        {% if current_user %}
+        <a class="btn primary" href="{{ url_for('console.index') }}">进入我的控制台 {{ icon("arrow-right", 16) }}</a>
+        <a class="btn outline" href="{{ url_for('attachments.index') }}">图床与附件</a>
+        {% else %}
+        <a class="btn primary" href="{{ url_for('auth.register') }}">免费创建账号 {{ icon("arrow-right", 16) }}</a>
+        <a class="btn outline" href="{{ url_for('auth.login') }}">已有账号，登录</a>
+        {% endif %}
+        {% if random_public %}
+        <a class="btn ghost" href="{{ url_for('public.share_note', note_id=random_public) }}">随机公开笔记</a>
+        {% endif %}
+      </div>
+      <ul class="hero-stats">
+        <li><strong>CommonMark</strong><span>标准 Markdown 渲染</span></li>
+        <li><strong>自动保存</strong><span>输入停顿后即时落盘</span></li>
+        <li><strong>只读分享</strong><span>公开页没有编辑入口</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section" id="features">
+    <header class="section-head">
+      <p class="eyebrow">项目能力</p>
+      <h2>为长期写作准备的编辑器</h2>
+      <p>从纯文本输入到代码高亮、数学公式与图表预览，全部在浏览器端完成，服务端只负责存储与同步。</p>
+    </header>
+
+    <div class="feature-grid">
+      <article class="feature-card">
+        <span class="feature-icon">{{ icon("edit", 20) }}</span>
+        <h3>双栏实时预览</h3>
+        <p>左侧书写 Markdown，右侧同步呈现排版结果，输入停顿后自动保存到你的账号。</p>
+      </article>
+      <article class="feature-card">
+        <span class="feature-icon">{{ icon("lock", 20) }}</span>
+        <h3>账号与私有空间</h3>
+        <p>注册、登录、退出都由服务端会话管理，密码以哈希存储，每篇笔记只属于它的作者。</p>
+      </article>
+      <article class="feature-card">
+        <span class="feature-icon">{{ icon("image", 20) }}</span>
+        <h3>图床与附件</h3>
+        <p>点击、拖拽或粘贴即可上传图片，自动插入 Markdown；所有文件通过不可猜测的链接访问。</p>
+      </article>
+      <article class="feature-card">
+        <span class="feature-icon">{{ icon("code", 20) }}</span>
+        <h3>代码高亮与检查</h3>
+        <p>highlight.js 着色常用语言，右上角还能就地运行语法静态检查，问题定位到行列。</p>
+      </article>
+      <article class="feature-card">
+        <span class="feature-icon">{{ icon("formula", 20) }}</span>
+        <h3>公式、图表与提醒</h3>
+        <p>KaTeX 数学公式、Mermaid 图表、GitHub 风格提示卡片与任务列表，都可以直接写进笔记。</p>
+      </article>
+      <article class="feature-card">
+        <span class="feature-icon">{{ icon("share", 20) }}</span>
+        <h3>只读链接分享</h3>
+        <p>公开一篇笔记后，任何人都能通过 <code>/share/&lt;id&gt;</code> 阅读，而内容始终由你维护。</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="section" id="workflow">
+    <header class="section-head">
+      <p class="eyebrow">三步开始</p>
+      <h2>写下第一行，剩下的交给它</h2>
+      <p>没有复杂的初始化，也没有需要安装的客户端。一个浏览器标签页就是全部工作区。</p>
+    </header>
+
+    <div class="workflow-grid">
+      <article class="step">
+        <span class="step-index">01</span>
+        <h3>创建账号</h3>
+        <p>注册后自动登录，进入属于你的控制台，所有笔记默认私有。</p>
+      </article>
+      <article class="step">
+        <span class="step-index">02</span>
+        <h3>写一篇笔记</h3>
+        <p>使用 CommonMark 写作，拖入图片或粘贴截图，预览会即时更新。</p>
+      </article>
+      <article class="step">
+        <span class="step-index">03</span>
+        <h3>分享只读链接</h3>
+        <p>需要时把笔记公开，把 <code>/share/&lt;id&gt;</code> 发给任何人，随时可以取消。</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="section" id="stack">
+    <header class="section-head">
+      <p class="eyebrow">技术栈</p>
+      <h2>轻量服务端，认真做的前端</h2>
+      <p>后端保持薄，渲染与检查留在浏览器；第三方库全部自托管，不依赖公共 CDN。</p>
+    </header>
+
+    <div class="stack-panel" aria-label="技术栈列表">
+      <span class="chip">Flask <span>3.x</span></span>
+      <span class="chip">SQLite <span>/ SQLAlchemy</span></span>
+      <span class="chip">CommonMark <span>marked</span></span>
+      <span class="chip">DOMPurify <span>sanitize</span></span>
+      <span class="chip">KaTeX <span>math</span></span>
+      <span class="chip">Mermaid <span>diagrams</span></span>
+      <span class="chip">highlight.js <span>syntax</span></span>
+      <span class="chip">Lezer <span>checks</span></span>
+      <span class="chip">Prism <span>Ruby</span></span>
+    </div>
+  </section>
+
+  <section class="section" id="recent">
+    <header class="section-head section-head-row">
+      <div>
+        <p class="eyebrow">公开笔记</p>
+        <h2>最近公开</h2>
+        <p>这些笔记由作者主动公开，任何人都可以只读访问。</p>
+      </div>
+      {% if random_public %}
+      <a class="btn outline" href="{{ url_for('public.share_note', note_id=random_public) }}">随机公开笔记</a>
+      {% endif %}
+    </header>
+
+    {% if recent %}
+    <ul class="recent-list">
+      {% for item in recent %}
+      <li>
+        <a href="{{ url_for('public.share_note', note_id=item.id) }}">{{ item.id }}</a>
+        <time data-relative datetime="{{ item.updated_at|iso_utc }}">{{ item.updated_at|iso_utc }}</time>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="console-empty">还没有公开笔记，登录后写下第一篇并选择公开吧。</p>
+    {% endif %}
+  </section>
+
+  <section class="cta-band">
+    <div>
+      <p class="eyebrow">现在开始</p>
+      <h2>下一段想法，值得被保存在线上。</h2>
+    </div>
+    <div class="cta-actions">
+      {% if current_user %}
+      <a class="btn primary" href="{{ url_for('console.index') }}">进入我的控制台</a>
+      {% else %}
+      <a class="btn primary" href="{{ url_for('auth.register') }}">免费创建账号</a>
+      <a class="btn outline" href="{{ url_for('auth.login') }}">登录</a>
+      {% endif %}
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <p>Nooote · 在线 CommonMark 笔记 · MIT License</p>
+    <nav aria-label="页脚链接">
+      <a href="https://github.com/chengzi404-hash/nooote" target="_blank" rel="noreferrer">GitHub {{ icon("external", 13) }}</a>
+      <a href="{{ url_for('public.index') }}#features">功能</a>
+      <a href="{{ url_for('public.index') }}#stack">技术栈</a>
+    </nav>
+  </footer>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='app.js') }}" defer></script>
+{% endblock %}

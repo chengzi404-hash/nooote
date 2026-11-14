@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+
+{% block title %}注册 · Nooote{% endblock %}
+{% block body_class %}auth-page{% endblock %}
+
+{% block content %}
+<main class="auth">
+  <aside class="auth-aside">
+    <a class="brand" href="{{ url_for('public.index') }}">
+      <span class="brand-mark">{{ icon("mark", 16) }}</span>
+      <span>Nooote</span>
+    </a>
+    <div class="auth-aside-body">
+      <p class="eyebrow">Start writing</p>
+      <h2>给想法<br>一个在线的位置。</h2>
+      <p>创建账号后即可拥有私有笔记空间，输入即自动保存，需要时一键公开。</p>
+      <ul class="auth-points">
+        <li>{{ icon("check", 15) }} 注册后自动登录</li>
+        <li>{{ icon("check", 15) }} 支持 Markdown、公式与图表</li>
+        <li>{{ icon("check", 15) }} 密码只保存哈希值</li>
+      </ul>
+    </div>
+    <p class="auth-aside-foot">MIT License · 自托管 · 无追踪</p>
+  </aside>
+
+  <section class="auth-card">
+    <header class="auth-card-head">
+      <p class="eyebrow">注册</p>
+      <h1>创建账号</h1>
+      <p class="auth-hint">创建账号后即可保存私有笔记。</p>
+    </header>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+      <ul class="flash-list">
+        {% for category, message in messages %}
+        <li class="flash flash-{{ category }}">{{ message }}</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+    {% endwith %}
+
+    <form method="post" action="{{ url_for('auth.register') }}" class="settings-form">
+      <label class="field">
+        <span class="field-label">用户名</span>
+        <input type="text" name="username" value="{{ username }}" required autofocus
+               autocomplete="username" minlength="3" maxlength="32" placeholder="3-32 位字符">
+        <span class="field-hint">3-32 位字母、数字、下划线、点或连字符。</span>
+      </label>
+      <label class="field">
+        <span class="field-label">密码</span>
+        <input type="password" name="password" required autocomplete="new-password"
+               minlength="8" placeholder="至少 8 位">
+        <span class="field-hint">至少 8 位。</span>
+      </label>
+      <label class="field">
+        <span class="field-label">确认密码</span>
+        <input type="password" name="confirm" required autocomplete="new-password"
+               minlength="8" placeholder="再次输入密码">
+      </label>
+      <button type="submit" class="btn primary block">创建账号 {{ icon("arrow-right", 15) }}</button>
+    </form>
+
+    <p class="auth-switch">已经有账号？<a href="{{ url_for('auth.login') }}">登录</a></p>
+  </section>
+</main>
+{% endblock %}

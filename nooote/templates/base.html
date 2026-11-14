@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="zh-CN"{% if theme and theme != 'auto' %} data-theme="{{ theme }}"{% endif %}>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="支持登录的在线 CommonMark 笔记">
+  <meta name="theme-color" content="#f3f1ec" media="(prefers-color-scheme:light)">
+  <meta name="theme-color" content="#0e0e12" media="(prefers-color-scheme:dark)">
+  <title>{% block title %}Nooote{% endblock %}</title>
+  <link rel="icon" href="{{ url_for('static', filename='favicon.svg') }}" type="image/svg+xml">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  {% if theme == 'dark' %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='vendor/github-dark.min.css') }}">
+  {% elif theme == 'light' %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='vendor/github.min.css') }}">
+  {% else %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='vendor/github.min.css') }}" media="(prefers-color-scheme: light)">
+  <link rel="stylesheet" href="{{ url_for('static', filename='vendor/github-dark.min.css') }}" media="(prefers-color-scheme: dark)">
+  {% endif %}
+  {% block head %}{% endblock %}
+</head>
+<body class="{% block body_class %}{% endblock %}">
+{% block content %}{% endblock %}
+{% block scripts %}{% endblock %}
+</body>
+</html>

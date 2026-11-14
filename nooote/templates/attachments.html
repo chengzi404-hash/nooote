@@ -1,0 +1,70 @@
+{% extends "console_base.html" %}
+{% from "_icons.html" import icon %}
+
+{% block title %}图床与附件 · Nooote{% endblock %}
+{% block crumb %}图床与附件{% endblock %}
+
+{% block console_content %}
+<header class="console-header">
+  <div>
+    <p class="eyebrow">Attachments</p>
+    <h1>图床与附件</h1>
+    <p>上传的图片和文件通过不可猜测的随机链接访问。任何拿到链接的人都能查看，请不要上传敏感内容。</p>
+  </div>
+</header>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  <ul class="flash-list">
+    {% for category, message in messages %}
+    <li class="flash flash-{{ category }}">{{ message }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+{% endwith %}
+
+<form method="post" action="{{ url_for('attachments.upload') }}"
+      enctype="multipart/form-data" class="upload-form">
+  <input type="file" name="file" required>
+  <button type="submit" class="btn primary">{{ icon("save", 15) }} 上传</button>
+  <span class="field-hint">单个文件上限 8 MiB。图片会插入为 Markdown 图片，其他文件插入为下载链接。</span>
+</form>
+
+{% if attachments %}
+<ul class="attachment-list">
+  {% for item in attachments %}
+  <li class="attachment-card">
+    <div class="attachment-preview">
+      {% if item.content_type.startswith('image/') and item.content_type != 'image/svg+xml' %}
+      <img src="{{ url_for('attachments.serve_attachment', attachment_id=item.id) }}"
+           alt="{{ item.filename }}" loading="lazy">
+      {% else %}
+      <span class="attachment-file">{{ item.filename.rsplit('.', 1)[-1]|upper if '.' in item.filename else 'FILE' }}</span>
+      {% endif %}
+    </div>
+    <div class="attachment-info">
+      <a class="attachment-name" href="{{ url_for('attachments.serve_attachment', attachment_id=item.id) }}"
+         target="_blank" rel="noreferrer">{{ item.filename }}</a>
+      <span class="attachment-meta">
+        {{ item.size|filesizeformat }} · {{ item.content_type }} ·
+        <time data-relative datetime="{{ item.created_at|iso_utc }}">{{ item.created_at|iso_utc }}</time>
+      </span>
+    </div>
+    <div class="attachment-actions">
+      <button type="button" class="btn small subtle"
+              data-copy="{{ url_for('attachments.serve_attachment', attachment_id=item.id) }}">复制链接</button>
+      <form method="post" action="{{ url_for('attachments.delete_attachment', attachment_id=item.id) }}"
+            data-confirm="删除后引用该附件的笔记将无法显示它，确定删除吗？">
+        <button type="submit" class="btn small danger">删除</button>
+      </form>
+    </div>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<div class="console-empty">
+  <p class="console-empty-title">还没有上传任何附件</p>
+  <p>上传图片后，可以直接在笔记编辑器中粘贴或拖拽使用。</p>
+</div>
+{% endif %}
+{% endblock %}

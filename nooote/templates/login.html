@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+
+{% block title %}登录 · Nooote{% endblock %}
+{% block body_class %}auth-page{% endblock %}
+
+{% block content %}
+<main class="auth">
+  <aside class="auth-aside">
+    <a class="brand" href="{{ url_for('public.index') }}">
+      <span class="brand-mark">{{ icon("mark", 16) }}</span>
+      <span>Nooote</span>
+    </a>
+    <div class="auth-aside-body">
+      <p class="eyebrow">Welcome back</p>
+      <h2>你的笔记<br>还在原来的位置。</h2>
+      <p>登录后继续编辑私有笔记，或者把某一篇公开成只读链接。</p>
+      <ul class="auth-points">
+        <li>{{ icon("check", 15) }} 输入停顿后自动保存</li>
+        <li>{{ icon("check", 15) }} 每篇笔记只有你能编辑</li>
+        <li>{{ icon("check", 15) }} 公开链接随时可以取消</li>
+      </ul>
+    </div>
+    <p class="auth-aside-foot">CommonMark · KaTeX · Mermaid</p>
+  </aside>
+
+  <section class="auth-card">
+    <header class="auth-card-head">
+      <p class="eyebrow">登录</p>
+      <h1>欢迎回来</h1>
+      <p class="auth-hint">登录后查看和管理你的私有笔记。</p>
+    </header>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+      <ul class="flash-list">
+        {% for category, message in messages %}
+        <li class="flash flash-{{ category }}">{{ message }}</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+    {% endwith %}
+
+    <form method="post" action="{{ url_for('auth.login', next=request.args.get('next')) }}"
+          class="settings-form">
+      <label class="field">
+        <span class="field-label">用户名</span>
+        <input type="text" name="username" value="{{ username }}" required autofocus
+               autocomplete="username" maxlength="32" placeholder="你的用户名">
+      </label>
+      <label class="field">
+        <span class="field-label">密码</span>
+        <input type="password" name="password" required autocomplete="current-password" placeholder="输入密码">
+      </label>
+      <button type="submit" class="btn primary block">登录 {{ icon("arrow-right", 15) }}</button>
+    </form>
+
+    <p class="auth-switch">还没有账号？<a href="{{ url_for('auth.register') }}">注册</a></p>
+  </section>
+</main>
+{% endblock %}
