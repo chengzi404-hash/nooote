@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="zh-CN"{% if theme and theme != 'auto' %} data-theme="{{ theme }}"{% endif %}>
+<html lang="{{ html_lang }}"{% if theme and theme != 'auto' %} data-theme="{{ theme }}"{% endif %}>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="支持登录的在线 CommonMark 笔记">
+  <meta name="description" content="{{ t('meta.description') }}">
   <meta name="theme-color" content="#f3f1ec" media="(prefers-color-scheme:light)">
   <meta name="theme-color" content="#0e0e12" media="(prefers-color-scheme:dark)">
   <title>{% block title %}Nooote{% endblock %}</title>
@@ -21,7 +21,9 @@
   {% endif %}
   {% block head %}{% endblock %}
 </head>
-<body class="{% block body_class %}{% endblock %}">
+<body class="{% block body_class %}{% endblock %}"
+      data-locale="{{ locale }}"
+      data-i18n='{{ js_messages|tojson }}'>
 {% block content %}{% endblock %}
 {% block scripts %}{% endblock %}
 </body>

@@ -1,15 +1,15 @@
 {% extends "console_base.html" %}
 {% from "_icons.html" import icon %}
 
-{% block title %}用户设置 · Nooote{% endblock %}
-{% block crumb %}用户设置{% endblock %}
+{% block title %}{{ t('settings.page_title') }}{% endblock %}
+{% block crumb %}{{ t('settings.crumb') }}{% endblock %}
 
 {% block console_content %}
 <header class="console-header">
   <div>
-    <p class="eyebrow">Settings</p>
-    <h1>用户设置</h1>
-    <p>当前账号：<strong>{{ current_user.username }}</strong>。这些设置会保存在你的账号中。</p>
+    <p class="eyebrow">{{ t('settings.eyebrow') }}</p>
+    <h1>{{ t('settings.heading') }}</h1>
+    <p>{{ t('settings.lead_prefix') }}<strong>{{ current_user.username }}</strong>{{ t('settings.lead_suffix') }}</p>
   </div>
 </header>
 
@@ -25,44 +25,57 @@
 
 <form method="post" action="{{ url_for('console.update_settings') }}" class="settings-form">
   <label class="field">
-    <span class="field-label">昵称</span>
+    <span class="field-label">{{ t('settings.display_name') }}</span>
     <input type="text" name="display_name" maxlength="64" autocomplete="nickname"
            value="{{ current_user.display_name if current_user else '' }}"
-           placeholder="留空则显示为「我的笔记」">
-    <span class="field-hint">仅用于控制台标题，不会出现在公开笔记中。</span>
+           placeholder="{{ t('settings.display_name_placeholder') }}">
+    <span class="field-hint">{{ t('settings.display_name_hint') }}</span>
   </label>
 
   <fieldset class="field">
-    <legend class="field-label">外观</legend>
+    <legend class="field-label">{{ t('settings.appearance') }}</legend>
     <div class="radio-group">
       <label class="radio">
         <input type="radio" name="theme" value="auto" {% if theme != 'light' and theme != 'dark' %}checked{% endif %}>
-        <span>跟随系统</span>
+        <span>{{ t('settings.theme_auto') }}</span>
       </label>
       <label class="radio">
         <input type="radio" name="theme" value="light" {% if theme == 'light' %}checked{% endif %}>
-        <span>浅色</span>
+        <span>{{ t('settings.theme_light') }}</span>
       </label>
       <label class="radio">
         <input type="radio" name="theme" value="dark" {% if theme == 'dark' %}checked{% endif %}>
-        <span>深色</span>
+        <span>{{ t('settings.theme_dark') }}</span>
       </label>
     </div>
-    <span class="field-hint">主题会应用到首页、控制台和编辑器。</span>
+    <span class="field-hint">{{ t('settings.theme_hint') }}</span>
+  </fieldset>
+
+  <fieldset class="field">
+    <legend class="field-label">{{ t('settings.language') }}</legend>
+    <div class="radio-group">
+      {% for code in locales %}
+      <label class="radio">
+        <input type="radio" name="locale" value="{{ code }}" {% if locale == code %}checked{% endif %}>
+        <span>{{ t('lang.' ~ code) }}</span>
+      </label>
+      {% endfor %}
+    </div>
+    <span class="field-hint">{{ t('settings.language_hint') }}</span>
   </fieldset>
 
   <label class="checkbox field">
     <input type="checkbox" name="default_public"
            {% if current_user and current_user.default_public %}checked{% endif %}>
     <span>
-      <span class="field-label">新笔记默认公开</span>
-      <span class="field-hint">勾选后，新建的笔记会立即出现在只读的 <code>/share/&lt;id&gt;</code> 页面。</span>
+      <span class="field-label">{{ t('settings.default_public') }}</span>
+      <span class="field-hint">{{ t('settings.default_public_hint')|safe }}</span>
     </span>
   </label>
 
   <div class="settings-actions">
-    <button type="submit" class="btn primary">{{ icon("save", 15) }} 保存设置</button>
-    <a class="btn outline" href="{{ url_for('console.index') }}">返回控制台</a>
+    <button type="submit" class="btn primary">{{ icon("save", 15) }} {{ t('settings.save') }}</button>
+    <a class="btn outline" href="{{ url_for('console.index') }}">{{ t('settings.back_console') }}</a>
   </div>
 </form>
 {% endblock %}

@@ -8,6 +8,9 @@ from sqlalchemy import inspect, text
 from .config import (
     Config,
     DEFAULT_DATABASE_URI,
+    DEFAULT_LOCALE,
+    LOCALES,
+    LOCALE_MAX_LENGTH,
     SECRET_KEY_BYTES,
     SECRET_KEY_FILE,
     UPLOAD_FOLDER_NAME,
@@ -15,6 +18,7 @@ from .config import (
     USER_ID_MAX_LENGTH,
 )
 from .extensions import db
+from .i18n import current_locale, html_lang, js_messages, t
 from .models import User, iso_utc
 from .vendor import sync_app as sync_vendor_assets
 
@@ -73,6 +77,11 @@ def _ensure_user_columns() -> None:
         statements.append(
             "ALTER TABLE users ADD COLUMN password_hash VARCHAR(255)"
         )
+    if "locale" not in columns:
+        statements.append(
+            "ALTER TABLE users ADD COLUMN locale "
+            f"VARCHAR({LOCALE_MAX_LENGTH}) NOT NULL DEFAULT '{DEFAULT_LOCALE}'"
+        )
 
     for statement in statements:
         db.session.execute(text(statement))
@@ -119,9 +128,15 @@ def create_app(test_config: dict | None = None) -> Flask:
     def inject_current_user():
         user_id = session.get("user_id")
         user = db.session.get(User, user_id) if user_id else None
+        locale = current_locale()
         return {
             "current_user": user,
             "theme": user.theme if user else "auto",
+            "locale": locale,
+            "locales": LOCALES,
+            "html_lang": html_lang(locale),
+            "t": t,
+            "js_messages": js_messages(locale),
         }
 
     @app.after_request

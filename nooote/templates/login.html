@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 {% from "_icons.html" import icon %}
+{% from "_i18n.html" import lang_switch with context %}
 
-{% block title %}登录 · Nooote{% endblock %}
+{% block title %}{{ t('auth.login_title') }}{% endblock %}
 {% block body_class %}auth-page{% endblock %}
 
 {% block content %}
@@ -12,23 +13,24 @@
       <span>Nooote</span>
     </a>
     <div class="auth-aside-body">
-      <p class="eyebrow">Welcome back</p>
-      <h2>你的笔记<br>还在原来的位置。</h2>
-      <p>登录后继续编辑私有笔记，或者把某一篇公开成只读链接。</p>
+      <p class="eyebrow">{{ t('auth.login_eyebrow') }}</p>
+      <h2>{{ t('auth.login_hero_line1') }}<br>{{ t('auth.login_hero_line2') }}</h2>
+      <p>{{ t('auth.login_hero_lead') }}</p>
       <ul class="auth-points">
-        <li>{{ icon("check", 15) }} 输入停顿后自动保存</li>
-        <li>{{ icon("check", 15) }} 每篇笔记只有你能编辑</li>
-        <li>{{ icon("check", 15) }} 公开链接随时可以取消</li>
+        <li>{{ icon("check", 15) }} {{ t('auth.point_autosave') }}</li>
+        <li>{{ icon("check", 15) }} {{ t('auth.point_private') }}</li>
+        <li>{{ icon("check", 15) }} {{ t('auth.point_unpublish') }}</li>
       </ul>
     </div>
-    <p class="auth-aside-foot">CommonMark · KaTeX · Mermaid</p>
+    <p class="auth-aside-foot">{{ t('auth.aside_foot') }}</p>
   </aside>
 
   <section class="auth-card">
+    <div class="auth-lang">{{ lang_switch() }}</div>
     <header class="auth-card-head">
-      <p class="eyebrow">登录</p>
-      <h1>欢迎回来</h1>
-      <p class="auth-hint">登录后查看和管理你的私有笔记。</p>
+      <p class="eyebrow">{{ t('auth.login_label') }}</p>
+      <h1>{{ t('auth.login_heading') }}</h1>
+      <p class="auth-hint">{{ t('auth.login_hint') }}</p>
     </header>
 
     {% with messages = get_flashed_messages(with_categories=true) %}
@@ -44,18 +46,18 @@
     <form method="post" action="{{ url_for('auth.login', next=request.args.get('next')) }}"
           class="settings-form">
       <label class="field">
-        <span class="field-label">用户名</span>
+        <span class="field-label">{{ t('auth.username') }}</span>
         <input type="text" name="username" value="{{ username }}" required autofocus
-               autocomplete="username" maxlength="32" placeholder="你的用户名">
+               autocomplete="username" maxlength="32" placeholder="{{ t('auth.username_placeholder') }}">
       </label>
       <label class="field">
-        <span class="field-label">密码</span>
-        <input type="password" name="password" required autocomplete="current-password" placeholder="输入密码">
+        <span class="field-label">{{ t('auth.password') }}</span>
+        <input type="password" name="password" required autocomplete="current-password" placeholder="{{ t('auth.password_placeholder') }}">
       </label>
-      <button type="submit" class="btn primary block">登录 {{ icon("arrow-right", 15) }}</button>
+      <button type="submit" class="btn primary block">{{ t('auth.login_button') }} {{ icon("arrow-right", 15) }}</button>
     </form>
 
-    <p class="auth-switch">还没有账号？<a href="{{ url_for('auth.register') }}">注册</a></p>
+    <p class="auth-switch">{{ t('auth.no_account') }}<a href="{{ url_for('auth.register') }}">{{ t('auth.register_link') }}</a></p>
   </section>
 </main>
 {% endblock %}

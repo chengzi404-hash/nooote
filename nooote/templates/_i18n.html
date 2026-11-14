@@ -1,0 +1,13 @@
+{% macro lang_switch(next=None) -%}
+{% set target = next if next is not none else request.full_path %}
+<form method="post" action="{{ url_for('language.switch') }}" class="lang-switch"
+      aria-label="{{ t('lang.switcher_label') }}">
+  <input type="hidden" name="next" value="{{ target }}">
+  {% for code in locales %}
+  <button type="submit" name="locale" value="{{ code }}"
+          class="lang-option{% if locale == code %} is-active{% endif %}"
+          {% if locale == code %}aria-current="true"{% endif %}
+          title="{{ t('lang.' ~ code) }}">{{ t('lang.' ~ code) }}</button>
+  {% endfor %}
+</form>
+{%- endmacro %}

@@ -60,8 +60,8 @@ def test_mermaid_blocks_toggle_between_diagram_and_code(client):
     assert "mermaid-block" in script
     assert "mermaid-toggle" in script
     assert "toggleMermaidView" in script
-    assert "查看代码" in script
-    assert "查看图表" in script
+    assert "js.view_code" in script
+    assert "js.view_diagram" in script
     assert ".mermaid-block" in css
     assert ".mermaid-toggle" in css
     assert '.mermaid-block[data-view="code"] .mermaid-source' in css

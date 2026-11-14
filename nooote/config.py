@@ -22,6 +22,13 @@ THEME_MAX_LENGTH = 16
 DEFAULT_THEME = "auto"
 THEMES = ("auto", "light", "dark")
 
+# Interface language
+LOCALE_MAX_LENGTH = 8
+DEFAULT_LOCALE = "zh"
+LOCALES = ("zh", "en")
+LOCALE_COOKIE = "lang"
+LOCALE_COOKIE_MAX_AGE = 60 * 60 * 24 * 365
+
 # Notes
 NOTE_ID_BYTES = 6
 NOTE_ID_MAX_LENGTH = 128

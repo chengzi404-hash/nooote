@@ -15,6 +15,7 @@ from sqlalchemy import select
 
 from ..config import ATTACHMENT_CACHE_SECONDS, ATTACHMENT_ID_RE
 from ..extensions import db
+from ..i18n import t
 from ..models import Attachment
 from ..services import (
     UploadError,
@@ -62,7 +63,7 @@ def upload():
         flash(error.message, "error")
         return redirect(url_for("attachments.index"))
 
-    flash(f"已上传 {attachment.filename}", "ok")
+    flash(t("attachments.uploaded", filename=attachment.filename), "ok")
     return redirect(url_for("attachments.index"))
 
 
@@ -76,7 +77,7 @@ def delete_attachment(attachment_id: str):
     db.session.commit()
     path.unlink(missing_ok=True)
 
-    flash("附件已删除", "ok")
+    flash(t("attachments.deleted"), "ok")
     return redirect(url_for("attachments.index"))
 
 

@@ -1677,7 +1677,7 @@ input[type="radio"]:focus-visible {
 }
 
 .markdown:empty::before {
-  content: "开始输入，预览会实时出现在这里。";
+  content: attr(data-empty-hint);
   color: var(--muted);
 }
 
@@ -2037,6 +2037,63 @@ input[type="radio"]:focus-visible {
   padding: 0;
   overflow: visible;
   background: transparent;
+}
+
+/* ---------- Language switch ---------- */
+
+.lang-switch {
+  display: inline-flex;
+  align-items: stretch;
+  flex: none;
+  gap: 0;
+  margin: 0;
+  border: 1px solid var(--line-strong);
+  border-radius: 0;
+}
+
+.lang-switch form,
+.lang-switch .lang-option {
+  margin: 0;
+}
+
+.lang-option {
+  min-width: 32px;
+  padding: 4px 7px;
+  border: 0;
+  border-radius: 0;
+  background: var(--panel);
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.5;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: color 0.12s ease, background-color 0.12s ease;
+}
+
+.lang-option + .lang-option {
+  border-left: 1px solid var(--line-strong);
+}
+
+.lang-option:hover {
+  color: var(--ink);
+}
+
+.lang-option.is-active {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.lang-option:focus-visible {
+  position: relative;
+  z-index: 1;
+}
+
+.auth-lang {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 18px;
 }
 
 /* ---------- Code copy button ---------- */

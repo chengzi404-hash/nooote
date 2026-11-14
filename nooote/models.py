@@ -6,8 +6,10 @@ from sqlalchemy.orm import Mapped, mapped_column
 from .config import (
     ATTACHMENT_ID_MAX_LENGTH,
     CONTENT_TYPE_MAX_LENGTH,
+    DEFAULT_LOCALE,
     DISPLAY_NAME_MAX_LENGTH,
     FILENAME_MAX_LENGTH,
+    LOCALE_MAX_LENGTH,
     NOTE_ID_MAX_LENGTH,
     PASSWORD_HASH_MAX_LENGTH,
     THEME_MAX_LENGTH,
@@ -47,6 +49,9 @@ class User(db.Model):
     default_public: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     theme: Mapped[str] = mapped_column(
         String(THEME_MAX_LENGTH), nullable=False, default="auto"
+    )
+    locale: Mapped[str] = mapped_column(
+        String(LOCALE_MAX_LENGTH), nullable=False, default=DEFAULT_LOCALE
     )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, default=utcnow

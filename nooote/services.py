@@ -5,6 +5,7 @@ import os
 import secrets
 from functools import wraps
 from pathlib import Path
+from urllib.parse import urlparse
 
 from flask import (
     abort,
@@ -29,6 +30,7 @@ from .config import (
     NOTE_ID_RE,
 )
 from .extensions import db
+from .i18n import t
 from .models import Attachment, Note, User, utcnow
 
 
@@ -41,6 +43,18 @@ class UploadError(Exception):
 
 def is_valid_note_id(note_id: str) -> bool:
     return bool(NOTE_ID_RE.fullmatch(note_id)) and note_id not in {".", ".."}
+
+
+def safe_redirect_target(value: str | None) -> str | None:
+    """Return a same-site relative path, or ``None`` for anything external."""
+    if not value:
+        return None
+    parsed = urlparse(value)
+    if parsed.scheme or parsed.netloc:
+        return None
+    if not value.startswith("/") or value[1:2] in ("/", "\\"):
+        return None
+    return value
 
 
 def current_user() -> User | None:
@@ -76,7 +90,7 @@ def api_login_required(view):
     @wraps(view)
     def wrapped(*args, **kwargs):
         if current_user() is None:
-            return jsonify(error="Authentication required"), 401
+            return jsonify(error=t("error.auth_required")), 401
         return view(*args, **kwargs)
 
     return wrapped
@@ -212,18 +226,18 @@ def generate_attachment_id() -> str:
 
 def save_upload(file) -> Attachment:
     if file is None or not file.filename:
-        raise UploadError("请选择要上传的文件")
+        raise UploadError(t("upload.file_required"))
 
     limit = current_app.config["MAX_UPLOAD_BYTES"]
     data = file.read(limit + 1)
     if len(data) > limit:
-        raise UploadError("文件过大，超出上传上限", 413)
+        raise UploadError(t("upload.file_too_large"), 413)
     if not data:
-        raise UploadError("文件为空")
+        raise UploadError(t("upload.file_empty"))
 
     user = current_user()
     if user is None:
-        raise UploadError("请先登录", 401)
+        raise UploadError(t("upload.login_required"), 401)
 
     attachment = Attachment(
         id=generate_attachment_id(),

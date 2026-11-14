@@ -9,3 +9,7 @@
 | `NOOOTE_SKIP_VENDOR_SYNC` | 未设置 | 设为任意非空值时跳过启动时的 vendor 资源同步 |
 
 笔记内容上限为 256 KiB（`MAX_NOTE_BYTES`），请求体上限为 10 MiB。默认配置与共享常量集中在 `nooote/config.py`，可在应用工厂中覆盖。
+
+## 界面语言
+
+支持中文（默认）与英文。语言解析顺序为：登录账号的语言设置 → `lang` cookie → 默认中文。匿名访客切换语言时写入有效期一年的 `lang` cookie；登录用户在设置页选择后会写入账号，并优先于 cookie。所有文案集中在 `nooote/i18n.py`，没有额外的环境变量。

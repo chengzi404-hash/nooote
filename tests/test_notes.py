@@ -80,7 +80,7 @@ def test_save_private_note_and_reload(auth_client):
 
     page = auth_client.get(f"/console/notes/{note_id}").get_data(as_text=True)
     assert content in page
-    assert 'data-preview aria-label="Markdown 预览"></article>' in page
+    assert 'data-preview aria-label="Markdown 预览"' in page
 
 
 def test_private_note_is_not_public_by_default(auth_client):

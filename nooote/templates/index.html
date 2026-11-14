@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 {% from "_icons.html" import icon %}
+{% from "_i18n.html" import lang_switch with context %}
 
-{% block title %}Nooote · 轻量的在线 Markdown 笔记{% endblock %}
+{% block title %}{{ t('home.title') }}{% endblock %}
 {% block body_class %}home-page{% endblock %}
 
 {% block content %}
@@ -12,22 +13,23 @@
       <span>Nooote</span>
     </a>
 
-    <nav class="site-nav" aria-label="站点导航">
-      <a href="#features">功能</a>
-      <a href="#workflow">工作流</a>
-      <a href="#recent">公开笔记</a>
+    <nav class="site-nav" aria-label="{{ t('nav.aria') }}">
+      <a href="#features">{{ t('nav.features') }}</a>
+      <a href="#workflow">{{ t('nav.workflow') }}</a>
+      <a href="#recent">{{ t('nav.recent') }}</a>
     </nav>
 
     <div class="site-actions">
+      {{ lang_switch() }}
       {% if current_user %}
       <span class="user-chip">{{ current_user.username }}</span>
-      <a class="btn small primary" href="{{ url_for('console.index') }}">进入我的控制台</a>
+      <a class="btn small primary" href="{{ url_for('console.index') }}">{{ t('nav.console') }}</a>
       <form method="post" action="{{ url_for('auth.logout') }}">
-        <button type="submit" class="btn small subtle">退出登录</button>
+        <button type="submit" class="btn small subtle">{{ t('nav.logout') }}</button>
       </form>
       {% else %}
-      <a class="btn small subtle" href="{{ url_for('auth.login') }}">登录</a>
-      <a class="btn small primary" href="{{ url_for('auth.register') }}">注册</a>
+      <a class="btn small subtle" href="{{ url_for('auth.login') }}">{{ t('nav.login') }}</a>
+      <a class="btn small primary" href="{{ url_for('auth.register') }}">{{ t('nav.register') }}</a>
       {% endif %}
     </div>
   </div>
@@ -39,107 +41,104 @@
          alt="" width="1600" height="640" fetchpriority="high">
     <div class="hero-overlay" aria-hidden="true"></div>
     <div class="hero-inner">
-      <p class="eyebrow">开源 · Flask · CommonMark</p>
-      <h1 id="hero-title">把想法写成笔记，<br><span class="hero-accent">让它在线上生长。</span></h1>
-      <p class="hero-lead">
-        Nooote 是一个轻量的在线 Markdown 笔记应用。登录后拥有自己的私有笔记空间，
-        输入停顿即自动保存；需要分享时，一条只读链接就够了。
-      </p>
+      <p class="eyebrow">{{ t('home.eyebrow') }}</p>
+      <h1 id="hero-title">{{ t('home.hero_title') }}<br><span class="hero-accent">{{ t('home.hero_accent') }}</span></h1>
+      <p class="hero-lead">{{ t('home.hero_lead') }}</p>
       <div class="hero-actions">
         {% if current_user %}
-        <a class="btn primary" href="{{ url_for('console.index') }}">进入我的控制台 {{ icon("arrow-right", 16) }}</a>
-        <a class="btn outline" href="{{ url_for('attachments.index') }}">图床与附件</a>
+        <a class="btn primary" href="{{ url_for('console.index') }}">{{ t('nav.console') }} {{ icon("arrow-right", 16) }}</a>
+        <a class="btn outline" href="{{ url_for('attachments.index') }}">{{ t('home.cta_attachments') }}</a>
         {% else %}
-        <a class="btn primary" href="{{ url_for('auth.register') }}">免费创建账号 {{ icon("arrow-right", 16) }}</a>
-        <a class="btn outline" href="{{ url_for('auth.login') }}">已有账号，登录</a>
+        <a class="btn primary" href="{{ url_for('auth.register') }}">{{ t('home.cta_register') }} {{ icon("arrow-right", 16) }}</a>
+        <a class="btn outline" href="{{ url_for('auth.login') }}">{{ t('home.cta_login') }}</a>
         {% endif %}
         {% if random_public %}
-        <a class="btn ghost" href="{{ url_for('public.share_note', note_id=random_public) }}">随机公开笔记</a>
+        <a class="btn ghost" href="{{ url_for('public.share_note', note_id=random_public) }}">{{ t('home.random') }}</a>
         {% endif %}
       </div>
       <ul class="hero-stats">
-        <li><strong>CommonMark</strong><span>标准 Markdown 渲染</span></li>
-        <li><strong>自动保存</strong><span>输入停顿后即时落盘</span></li>
-        <li><strong>只读分享</strong><span>公开页没有编辑入口</span></li>
+        <li><strong>{{ t('home.stat_commonmark') }}</strong><span>{{ t('home.stat_commonmark_hint') }}</span></li>
+        <li><strong>{{ t('home.stat_autosave') }}</strong><span>{{ t('home.stat_autosave_hint') }}</span></li>
+        <li><strong>{{ t('home.stat_share') }}</strong><span>{{ t('home.stat_share_hint') }}</span></li>
       </ul>
     </div>
   </section>
 
   <section class="section" id="features">
     <header class="section-head">
-      <p class="eyebrow">项目能力</p>
-      <h2>为长期写作准备的编辑器</h2>
-      <p>从纯文本输入到代码高亮、数学公式与图表预览，全部在浏览器端完成，服务端只负责存储与同步。</p>
+      <p class="eyebrow">{{ t('home.features_eyebrow') }}</p>
+      <h2>{{ t('home.features_title') }}</h2>
+      <p>{{ t('home.features_lead') }}</p>
     </header>
 
     <div class="feature-grid">
       <article class="feature-card">
         <span class="feature-icon">{{ icon("edit", 20) }}</span>
-        <h3>双栏实时预览</h3>
-        <p>左侧书写 Markdown，右侧同步呈现排版结果，输入停顿后自动保存到你的账号。</p>
+        <h3>{{ t('home.feature_preview_title') }}</h3>
+        <p>{{ t('home.feature_preview_body') }}</p>
       </article>
       <article class="feature-card">
         <span class="feature-icon">{{ icon("lock", 20) }}</span>
-        <h3>账号与私有空间</h3>
-        <p>注册、登录、退出都由服务端会话管理，密码以哈希存储，每篇笔记只属于它的作者。</p>
+        <h3>{{ t('home.feature_account_title') }}</h3>
+        <p>{{ t('home.feature_account_body') }}</p>
       </article>
       <article class="feature-card">
         <span class="feature-icon">{{ icon("image", 20) }}</span>
-        <h3>图床与附件</h3>
-        <p>点击、拖拽或粘贴即可上传图片，自动插入 Markdown；所有文件通过不可猜测的链接访问。</p>
+        <h3>{{ t('home.feature_upload_title') }}</h3>
+        <p>{{ t('home.feature_upload_body') }}</p>
       </article>
       <article class="feature-card">
         <span class="feature-icon">{{ icon("code", 20) }}</span>
-        <h3>代码高亮与复制</h3>
-        <p>highlight.js 为常用语言着色，每个代码块右上角都有一键复制按钮，随手取用示例代码。</p>
+        <h3>{{ t('home.feature_code_title') }}</h3>
+        <p>{{ t('home.feature_code_body') }}</p>
       </article>
       <article class="feature-card">
         <span class="feature-icon">{{ icon("formula", 20) }}</span>
-        <h3>公式、图表与提醒</h3>
-        <p>KaTeX 数学公式、Mermaid 图表、GitHub 风格提示卡片与任务列表，都可以直接写进笔记。</p>
+        <h3>{{ t('home.feature_rich_title') }}</h3>
+        <p>{{ t('home.feature_rich_body') }}</p>
       </article>
       <article class="feature-card">
         <span class="feature-icon">{{ icon("share", 20) }}</span>
-        <h3>只读链接分享</h3>
-        <p>公开一篇笔记后，任何人都能通过 <code>/share/&lt;id&gt;</code> 阅读，而内容始终由你维护。</p>
+        <h3>{{ t('home.feature_share_title') }}</h3>
+        <p>{{ t('home.feature_share_body')|safe }}</p>
       </article>
     </div>
   </section>
 
   <section class="section" id="workflow">
     <header class="section-head">
-      <p class="eyebrow">三步开始</p>
-      <h2>写下第一行，剩下的交给它</h2>
-      <p>没有复杂的初始化，也没有需要安装的客户端。一个浏览器标签页就是全部工作区。</p>
+      <p class="eyebrow">{{ t('home.workflow_eyebrow') }}</p>
+      <h2>{{ t('home.workflow_title') }}</h2>
+      <p>{{ t('home.workflow_lead') }}</p>
     </header>
 
     <div class="workflow-grid">
       <article class="step">
         <span class="step-index">01</span>
-        <h3>创建账号</h3>
-        <p>注册后自动登录，进入属于你的控制台，所有笔记默认私有。</p>
+        <h3>{{ t('home.step_account_title') }}</h3>
+        <p>{{ t('home.step_account_body') }}</p>
       </article>
       <article class="step">
         <span class="step-index">02</span>
-        <h3>写一篇笔记</h3>
-        <p>使用 CommonMark 写作，拖入图片或粘贴截图，预览会即时更新。</p>
+        <h3>{{ t('home.step_write_title') }}</h3>
+        <p>{{ t('home.step_write_body') }}</p>
       </article>
       <article class="step">
         <span class="step-index">03</span>
-        <h3>分享只读链接</h3>
-        <p>需要时把笔记公开，把 <code>/share/&lt;id&gt;</code> 发给任何人，随时可以取消。</p>
+        <h3>{{ t('home.step_share_title') }}</h3>
+        <p>{{ t('home.step_share_body')|safe }}</p>
       </article>
     </div>
   </section>
 
   <section class="section" id="stack">
     <header class="section-head">
-      <p class="eyebrow">技术栈</p>
-      <h2>轻量服务端，认真做的前端</h2>
-      <p>后端保持薄，渲染与检查留在浏览器；第三方库全部自托管，不依赖公共 CDN。</p>
+      <p class="eyebrow">{{ t('home.stack_eyebrow') }}</p>
+      <h2>{{ t('home.stack_title') }}</h2>
+      <p>{{ t('home.stack_lead') }}</p>
     </header>
 
-    <div class="stack-panel" aria-label="技术栈列表">
+    <div class="stack-panel" aria-label="{{ t('home.stack_aria') }}">
       <span class="chip">Flask <span>3.x</span></span>
       <span class="chip">SQLite <span>/ SQLAlchemy</span></span>
       <span class="chip">CommonMark <span>marked</span></span>
@@ -153,12 +152,12 @@
   <section class="section" id="recent">
     <header class="section-head section-head-row">
       <div>
-        <p class="eyebrow">公开笔记</p>
-        <h2>最近公开</h2>
-        <p>这些笔记由作者主动公开，任何人都可以只读访问。</p>
+        <p class="eyebrow">{{ t('home.recent_eyebrow') }}</p>
+        <h2>{{ t('home.recent_title') }}</h2>
+        <p>{{ t('home.recent_lead') }}</p>
       </div>
       {% if random_public %}
-      <a class="btn outline" href="{{ url_for('public.share_note', note_id=random_public) }}">随机公开笔记</a>
+      <a class="btn outline" href="{{ url_for('public.share_note', note_id=random_public) }}">{{ t('home.random') }}</a>
       {% endif %}
     </header>
 
@@ -172,31 +171,31 @@
       {% endfor %}
     </ul>
     {% else %}
-    <p class="console-empty">还没有公开笔记，登录后写下第一篇并选择公开吧。</p>
+    <p class="console-empty">{{ t('home.recent_empty') }}</p>
     {% endif %}
   </section>
 
   <section class="cta-band">
     <div>
-      <p class="eyebrow">现在开始</p>
-      <h2>下一段想法，值得被保存在线上。</h2>
+      <p class="eyebrow">{{ t('home.cta_eyebrow') }}</p>
+      <h2>{{ t('home.cta_title') }}</h2>
     </div>
     <div class="cta-actions">
       {% if current_user %}
-      <a class="btn primary" href="{{ url_for('console.index') }}">进入我的控制台</a>
+      <a class="btn primary" href="{{ url_for('console.index') }}">{{ t('nav.console') }}</a>
       {% else %}
-      <a class="btn primary" href="{{ url_for('auth.register') }}">免费创建账号</a>
-      <a class="btn outline" href="{{ url_for('auth.login') }}">登录</a>
+      <a class="btn primary" href="{{ url_for('auth.register') }}">{{ t('home.cta_register') }}</a>
+      <a class="btn outline" href="{{ url_for('auth.login') }}">{{ t('nav.login') }}</a>
       {% endif %}
     </div>
   </section>
 
   <footer class="site-footer">
-    <p>Nooote · 在线 CommonMark 笔记 · MIT License</p>
-    <nav aria-label="页脚链接">
+    <p>{{ t('home.footer') }}</p>
+    <nav aria-label="{{ t('home.footer_aria') }}">
       <a href="https://github.com/chengzi404-hash/nooote" target="_blank" rel="noreferrer">GitHub {{ icon("external", 13) }}</a>
-      <a href="{{ url_for('public.index') }}#features">功能</a>
-      <a href="{{ url_for('public.index') }}#stack">技术栈</a>
+      <a href="{{ url_for('public.index') }}#features">{{ t('nav.features') }}</a>
+      <a href="{{ url_for('public.index') }}#stack">{{ t('nav.stack') }}</a>
     </nav>
   </footer>
 </main>

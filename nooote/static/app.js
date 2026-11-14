@@ -9,8 +9,44 @@
     return icon;
   }
 
+  const FALLBACK_MESSAGES = {
+    "markdown.note": "注意",
+    "markdown.tip": "提示",
+    "markdown.important": "重要",
+    "markdown.warning": "警告",
+    "markdown.caution": "谨慎",
+  };
+
+  function loadMessages() {
+    const raw = document.body.dataset.i18n;
+    if (!raw) return FALLBACK_MESSAGES;
+
+    try {
+      const parsed = JSON.parse(raw);
+      return parsed && typeof parsed === "object"
+        ? { ...FALLBACK_MESSAGES, ...parsed }
+        : FALLBACK_MESSAGES;
+    } catch (error) {
+      return FALLBACK_MESSAGES;
+    }
+  }
+
+  const MESSAGES = loadMessages();
+  const LOCALE = document.body.dataset.locale === "en" ? "en" : "zh";
+  const INTL_LOCALE = LOCALE === "en" ? "en" : "zh-CN";
+
+  function tx(key, params) {
+    const template = MESSAGES[key];
+    if (typeof template !== "string") return key;
+    if (!params) return template;
+
+    return template.replace(/\{(\w+)\}/g, (match, name) => (
+      Object.prototype.hasOwnProperty.call(params, name) ? String(params[name]) : match
+    ));
+  }
+
   const relativeFormatter = typeof Intl !== "undefined" && Intl.RelativeTimeFormat
-    ? new Intl.RelativeTimeFormat("zh-CN", { numeric: "auto" })
+    ? new Intl.RelativeTimeFormat(INTL_LOCALE, { numeric: "auto" })
     : null;
 
   const RELATIVE_UNITS = [
@@ -27,21 +63,21 @@
     if (Number.isNaN(date.getTime())) return iso;
 
     const diff = date.getTime() - Date.now();
-    if (Math.abs(diff) < 45000) return "刚刚";
+    if (Math.abs(diff) < 45000) return tx("js.just_now");
 
     for (const [unit, ms] of RELATIVE_UNITS) {
       if (Math.abs(diff) >= ms) {
         const value = Math.round(diff / ms);
-        return relativeFormatter ? relativeFormatter.format(value, unit) : date.toLocaleString("zh-CN");
+        return relativeFormatter ? relativeFormatter.format(value, unit) : date.toLocaleString(INTL_LOCALE);
       }
     }
-    return date.toLocaleString("zh-CN");
+    return date.toLocaleString(INTL_LOCALE);
   }
 
   function formatAbsolute(iso) {
     const date = new Date(iso);
     if (Number.isNaN(date.getTime())) return iso;
-    return date.toLocaleString("zh-CN", { dateStyle: "medium", timeStyle: "short" });
+    return date.toLocaleString(INTL_LOCALE, { dateStyle: "medium", timeStyle: "short" });
   }
 
   function refreshTimes(root = document) {
@@ -69,10 +105,10 @@
     try {
       await navigator.clipboard.writeText(url);
       const original = trigger.textContent;
-      trigger.textContent = "已复制";
+      trigger.textContent = tx("js.copied");
       setTimeout(() => { trigger.textContent = original; }, 1500);
     } catch (error) {
-      window.prompt("复制链接", url);
+      window.prompt(tx("js.copy_link"), url);
     }
   });
 
@@ -238,7 +274,7 @@
     const button = document.createElement("button");
     button.type = "button";
     button.className = "code-copy";
-    button.title = "复制代码";
+    button.title = tx("js.copy_code");
     button.setAttribute("aria-label", button.title);
     button.appendChild(faIcon("copy"));
 
@@ -249,11 +285,11 @@
         await copyText(block.textContent);
         button.replaceChildren(faIcon("check"));
         button.dataset.state = "copied";
-        button.title = "已复制";
+        button.title = tx("js.copied");
         button.setAttribute("aria-label", button.title);
       } catch (error) {
         button.dataset.state = "error";
-        button.title = "复制失败";
+        button.title = tx("js.copy_failed");
         button.setAttribute("aria-label", button.title);
       }
 
@@ -261,7 +297,7 @@
       resetTimer = setTimeout(() => {
         button.replaceChildren(faIcon("copy"));
         delete button.dataset.state;
-        button.title = "复制代码";
+        button.title = tx("js.copy_code");
         button.setAttribute("aria-label", button.title);
       }, COPY_RESET_MS);
     });
@@ -274,11 +310,11 @@
   }
 
   const ALERT_LABELS = {
-    note: { icon: "circle-info", label: "注意" },
-    tip: { icon: "lightbulb", label: "提示" },
-    important: { icon: "circle-exclamation", label: "重要" },
-    warning: { icon: "triangle-exclamation", label: "警告" },
-    caution: { icon: "ban", label: "谨慎" },
+    note: { icon: "circle-info", key: "markdown.note" },
+    tip: { icon: "lightbulb", key: "markdown.tip" },
+    important: { icon: "circle-exclamation", key: "markdown.important" },
+    warning: { icon: "triangle-exclamation", key: "markdown.warning" },
+    caution: { icon: "ban", key: "markdown.caution" },
   };
 
   const ALERT_MARKER = /^\s*\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]\s*/i;
@@ -316,7 +352,8 @@
 
       const title = document.createElement("p");
       title.className = "markdown-alert-title";
-      title.append(faIcon(alertConfig.icon, alertConfig.label), alertConfig.label);
+      const label = tx(alertConfig.key);
+      title.append(faIcon(alertConfig.icon, label), label);
       alert.appendChild(title);
 
       if (!first.textContent.trim() && first.children.length === 0) {
@@ -345,8 +382,8 @@
 
   const MERMAID_LANGUAGES = new Set(["mermaid", "mmd"]);
   const MERMAID_VIEW_ACTIONS = {
-    diagram: { icon: "code", label: "查看代码" },
-    code: { icon: "diagram-project", label: "查看图表" },
+    diagram: { icon: "code", key: "js.view_code" },
+    code: { icon: "diagram-project", key: "js.view_diagram" },
   };
   const MERMAID_DARK_THEME = {
     background: "transparent",
@@ -389,7 +426,7 @@
     if (mermaidPromise) return mermaidPromise;
 
     const source = workspace.dataset.mermaidSrc;
-    if (!source) return Promise.reject(new Error("缺少 Mermaid 资源地址"));
+    if (!source) return Promise.reject(new Error(tx("js.mermaid_missing_src")));
 
     mermaidPromise = new Promise((resolve, reject) => {
       const script = document.createElement("script");
@@ -398,7 +435,7 @@
 
       script.onload = () => {
         if (typeof mermaid === "undefined") {
-          reject(new Error("Mermaid 加载后不可用"));
+          reject(new Error(tx("js.mermaid_unavailable")));
           return;
         }
         resolve(mermaid);
@@ -406,7 +443,7 @@
 
       script.onerror = () => {
         script.remove();
-        reject(new Error("无法加载 Mermaid"));
+        reject(new Error(tx("js.mermaid_load_failed")));
       };
 
       document.head.appendChild(script);
@@ -460,7 +497,7 @@
 
       const title = document.createElement("p");
       title.className = "mermaid-error-title";
-      title.textContent = "图表渲染失败";
+      title.textContent = tx("js.mermaid_render_failed");
 
       const message = document.createElement("p");
       message.className = "mermaid-error-message";
@@ -486,9 +523,10 @@
     const button = block.querySelector(".mermaid-toggle");
     if (!button) return;
 
+    const label = tx(action.key);
     button.replaceChildren(faIcon(action.icon));
-    button.title = action.label;
-    button.setAttribute("aria-label", action.label);
+    button.title = label;
+    button.setAttribute("aria-label", label);
     button.setAttribute("aria-pressed", showCode ? "true" : "false");
   }
 
@@ -511,7 +549,7 @@
 
     const placeholder = document.createElement("p");
     placeholder.className = "mermaid-placeholder";
-    placeholder.textContent = "正在渲染图表…";
+    placeholder.textContent = tx("js.mermaid_rendering");
     container.appendChild(placeholder);
 
     const source = document.createElement("div");
@@ -520,7 +558,7 @@
     const button = document.createElement("button");
     button.type = "button";
     button.className = "mermaid-toggle";
-    button.title = MERMAID_VIEW_ACTIONS.diagram.label;
+    button.title = tx(MERMAID_VIEW_ACTIONS.diagram.key);
     button.setAttribute("aria-label", button.title);
     button.setAttribute("aria-pressed", "false");
     button.appendChild(faIcon(MERMAID_VIEW_ACTIONS.diagram.icon));
@@ -637,7 +675,7 @@
 
     saving = true;
     dirty = false;
-    setStatus("保存中…", "saving");
+    setStatus(tx("js.saving"), "saving");
 
     try {
       const response = await fetch(`/api/console/notes/${encodeURIComponent(noteId)}`, {
@@ -647,7 +685,7 @@
       });
       if (response.status === 413) {
         dirty = true;
-        setStatus("内容过大，无法保存", "error");
+        setStatus(tx("js.too_large"), "error");
         return;
       }
       if (!response.ok) throw new Error("save failed");
@@ -656,14 +694,14 @@
       showSavedAt(data.updated_at);
 
       if (dirty) {
-        setStatus("正在输入…", "dirty");
+        setStatus(tx("js.typing"), "dirty");
         scheduleSave(400);
       } else {
-        setStatus("已保存", "saved");
+        setStatus(tx("js.saved"), "saved");
       }
     } catch (error) {
       dirty = true;
-      setStatus("保存失败，正在重试…", "error");
+      setStatus(tx("js.save_failed"), "error");
       scheduleSave(4000);
     } finally {
       saving = false;
@@ -691,7 +729,7 @@
       const selected = Array.from(files || []);
       if (selected.length === 0) return;
 
-      setStatus(`上传中… (0/${selected.length})`, "saving");
+      setStatus(tx("js.uploading", { done: 0, total: selected.length }), "saving");
 
       try {
         for (let index = 0; index < selected.length; index += 1) {
@@ -704,16 +742,19 @@
           });
           if (!response.ok) {
             const payload = await response.json().catch(() => ({}));
-            throw new Error(payload.error || "上传失败");
+            throw new Error(payload.error || tx("js.upload_failed"));
           }
 
           const data = await response.json();
           insertMarkdown(data.markdown);
-          setStatus(`上传中… (${index + 1}/${selected.length})`, "saving");
+          setStatus(
+            tx("js.uploading", { done: index + 1, total: selected.length }),
+            "saving"
+          );
         }
-        setStatus("正在输入…", "dirty");
+        setStatus(tx("js.typing"), "dirty");
       } catch (error) {
-        setStatus(error.message || "上传失败", "error");
+        setStatus(error.message || tx("js.upload_failed"), "error");
       }
     }
 
@@ -746,7 +787,7 @@
 
     textarea.addEventListener("input", () => {
       dirty = true;
-      setStatus("正在输入…", "dirty");
+      setStatus(tx("js.typing"), "dirty");
       schedulePreview();
       scheduleSave();
     });

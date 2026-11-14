@@ -5,6 +5,7 @@ from sqlalchemy import select
 
 from ..config import DEFAULT_THEME, DISPLAY_NAME_MAX_LENGTH, THEMES
 from ..extensions import db
+from ..i18n import normalize_locale, set_locale_cookie, t
 from ..models import Note, utcnow
 from ..services import (
     console_stats,
@@ -105,6 +106,12 @@ def update_settings():
     user.theme = theme if theme in THEMES else DEFAULT_THEME
     user.default_public = request.form.get("default_public") == "on"
 
+    locale = normalize_locale(request.form.get("locale"))
+    if locale is not None:
+        user.locale = locale
+
     db.session.commit()
-    flash("设置已保存", "ok")
-    return redirect(url_for("console.settings"))
+    flash(t("settings.saved"), "ok")
+
+    response = redirect(url_for("console.settings"))
+    return set_locale_cookie(response, user.locale) if locale else response

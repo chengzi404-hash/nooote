@@ -2,6 +2,7 @@
 
 from flask import Blueprint, jsonify, url_for
 
+from ..i18n import t
 from ..models import iso_utc
 from ..services import (
     api_login_required,
@@ -20,7 +21,7 @@ bp = Blueprint("notes_api", __name__)
 @api_login_required
 def api_get_owned_note(note_id: str):
     if not is_valid_note_id(note_id):
-        return jsonify(error="Invalid note id"), 400
+        return jsonify(error=t("error.invalid_note_id")), 400
 
     note = get_owned_note(note_id)
     return jsonify(
@@ -37,17 +38,17 @@ def api_get_owned_note(note_id: str):
 @api_login_required
 def api_save_owned_note(note_id: str):
     if not is_valid_note_id(note_id):
-        return jsonify(error="Invalid note id"), 400
+        return jsonify(error=t("error.invalid_note_id")), 400
 
     note = get_owned_note(note_id)
 
     data = read_json_object()
     if data is None or not isinstance(data.get("content"), str):
-        return jsonify(error='Expected JSON body with a "content" string'), 400
+        return jsonify(error=t("error.content_required")), 400
 
     content = data["content"]
     if too_large(content):
-        return jsonify(error="Note content is too large"), 413
+        return jsonify(error=t("error.content_too_large")), 413
 
     note = save_owned_note(note, content)
     return jsonify(
@@ -61,7 +62,7 @@ def api_save_owned_note(note_id: str):
 @bp.get("/api/share/<note_id>")
 def api_get_public_note(note_id: str):
     if not is_valid_note_id(note_id):
-        return jsonify(error="Invalid note id"), 400
+        return jsonify(error=t("error.invalid_note_id")), 400
 
     note = get_public_note(note_id)
     return jsonify(
