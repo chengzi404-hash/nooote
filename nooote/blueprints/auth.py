@@ -18,12 +18,18 @@ from ..config import (
 from ..extensions import db
 from ..models import User
 from ..services import current_user, login_user, logout_user
+from urllib.parse import urlparse
 
 bp = Blueprint("auth", __name__)
 
 
 def _safe_next(value: str | None) -> str | None:
-    if not value or not value.startswith("/") or value.startswith("//"):
+    if not value:
+        return None
+    parsed = urlparse(value)
+    if parsed.scheme or parsed.netloc:
+        return None
+    if not value.startswith("/") or value[1:2] in ("/", "\\"):
         return None
     return value
 
