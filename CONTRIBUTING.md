@@ -37,6 +37,14 @@ uv run pytest
 uv run pytest tests/test_notes.py -k save
 ```
 
+测试用例相互独立（每个用例使用临时数据库），建议用 [pytest-xdist](https://pytest-xdist.readthedocs.io/) 并行运行，能明显缩短整套测试的时间：
+
+```bash
+uv run pytest -n auto
+```
+
+`pytest-xdist` 已在 `uv sync` 时随开发依赖装好，无需额外安装。如果并行下出现难以复现的失败，先用上面的单进程命令确认是否为用例间共享状态导致。
+
 ## 质量门槛
 
 ### 覆盖率
@@ -86,7 +94,7 @@ git push origin known-good-26111015
 
 1. Fork 仓库并从默认分支创建分支，例如 `fix/autosave-race`
 2. 保持改动聚焦，一个 PR 只做一件事
-3. 运行 `uv run pytest` 并通过
+3. 运行 `uv run pytest -n auto` 并通过
 4. 填写 PR 模板中的改动说明和验证方式
 5. 描述里关联相关 Issue（如 `Closes #12`）
 
