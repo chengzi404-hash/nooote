@@ -3,15 +3,12 @@
 import mimetypes
 import os
 import secrets
-from functools import wraps
 from pathlib import Path
 from urllib.parse import urlparse
 
 from flask import (
     abort,
     current_app,
-    jsonify,
-    redirect,
     request,
     session,
     url_for,
@@ -22,12 +19,14 @@ from .config import (
     ATTACHMENT_ID_BYTES,
     ATTACHMENT_ID_RE,
     CONTENT_TYPE_RE,
+    DEFAULT_ROLE,
     FILENAME_MAX_LENGTH,
     ID_GENERATION_ATTEMPTS,
     IMAGE_CONTENT_TYPES,
     INLINE_IMAGE_TYPES,
     NOTE_ID_BYTES,
     NOTE_ID_RE,
+    ROLE_PERMISSIONS,
 )
 from .extensions import db
 from .i18n import t
@@ -72,28 +71,6 @@ def login_user(user: User) -> None:
 
 def logout_user() -> None:
     session.clear()
-
-
-def login_required(view):
-    @wraps(view)
-    def wrapped(*args, **kwargs):
-        if current_user() is None:
-            if request.method == "GET":
-                return redirect(url_for("auth.login", next=request.path))
-            return redirect(url_for("auth.login"))
-        return view(*args, **kwargs)
-
-    return wrapped
-
-
-def api_login_required(view):
-    @wraps(view)
-    def wrapped(*args, **kwargs):
-        if current_user() is None:
-            return jsonify(error=t("error.auth_required")), 401
-        return view(*args, **kwargs)
-
-    return wrapped
 
 
 def get_owned_note(note_id: str) -> Note:
@@ -172,6 +149,45 @@ def console_stats(user_id: str) -> dict[str, int]:
         "public": public,
         "private": total - public,
         "attachments": attachments,
+    }
+
+
+def site_stats() -> dict[str, object]:
+    """Site-wide aggregates shown on the management dashboard."""
+    total_notes = db.session.scalar(
+        select(func.count()).select_from(Note)
+    ) or 0
+    public_notes = db.session.scalar(
+        select(func.count()).select_from(Note).where(Note.is_public.is_(True))
+    ) or 0
+    total_attachments = db.session.scalar(
+        select(func.count()).select_from(Attachment)
+    ) or 0
+    attachment_bytes = db.session.scalar(
+        select(func.coalesce(func.sum(Attachment.size), 0))
+    ) or 0
+    note_bytes = db.session.scalar(
+        select(func.coalesce(func.sum(func.length(Note.content)), 0))
+    ) or 0
+    total_users = db.session.scalar(
+        select(func.count()).select_from(User)
+    ) or 0
+
+    role_counts = {role: 0 for role in ROLE_PERMISSIONS}
+    for role, count in db.session.execute(
+        select(User.role, func.count()).group_by(User.role)
+    ).all():
+        role_counts[role if role in ROLE_PERMISSIONS else DEFAULT_ROLE] += count
+
+    return {
+        "users": total_users,
+        "role_counts": role_counts,
+        "notes": total_notes,
+        "public_notes": public_notes,
+        "private_notes": total_notes - public_notes,
+        "attachments": total_attachments,
+        "attachment_bytes": attachment_bytes,
+        "note_bytes": note_bytes,
     }
 
 

@@ -2,15 +2,18 @@ import os
 import secrets
 from pathlib import Path
 
-from flask import Flask, session
+from flask import Flask, jsonify, render_template, request, session
 from sqlalchemy import inspect, text
 
 from .config import (
+    ADMIN_USERNAMES_ENV,
     Config,
     DEFAULT_DATABASE_URI,
     DEFAULT_LOCALE,
+    DEFAULT_ROLE,
     LOCALES,
     LOCALE_MAX_LENGTH,
+    ROLE_MAX_LENGTH,
     SECRET_KEY_BYTES,
     SECRET_KEY_FILE,
     UPLOAD_FOLDER_NAME,
@@ -20,6 +23,7 @@ from .config import (
 from .extensions import db
 from .i18n import current_locale, html_lang, js_messages, t
 from .models import User, iso_utc
+from .permissions import enforce_permissions, granted_permissions
 from .vendor import sync_app as sync_vendor_assets
 
 
@@ -82,6 +86,11 @@ def _ensure_user_columns() -> None:
             "ALTER TABLE users ADD COLUMN locale "
             f"VARCHAR({LOCALE_MAX_LENGTH}) NOT NULL DEFAULT '{DEFAULT_LOCALE}'"
         )
+    if "role" not in columns:
+        statements.append(
+            "ALTER TABLE users ADD COLUMN role "
+            f"VARCHAR({ROLE_MAX_LENGTH}) NOT NULL DEFAULT '{DEFAULT_ROLE}'"
+        )
 
     for statement in statements:
         db.session.execute(text(statement))
@@ -102,6 +111,11 @@ def create_app(test_config: dict | None = None) -> Flask:
     app.config.update(
         SQLALCHEMY_DATABASE_URI=os.environ.get("DATABASE_URL", DEFAULT_DATABASE_URI),
         UPLOAD_FOLDER=os.path.join(app.instance_path, UPLOAD_FOLDER_NAME),
+        ADMIN_USERNAMES=frozenset(
+            name.strip()
+            for name in os.environ.get(ADMIN_USERNAMES_ENV, "").split(",")
+            if name.strip()
+        ),
     )
     if test_config:
         app.config.update(test_config)
@@ -122,6 +136,7 @@ def create_app(test_config: dict | None = None) -> Flask:
     from .blueprints import register_blueprints
 
     register_blueprints(app)
+    app.before_request(enforce_permissions)
     app.add_template_filter(iso_utc)
 
     @app.context_processor
@@ -137,7 +152,14 @@ def create_app(test_config: dict | None = None) -> Flask:
             "html_lang": html_lang(locale),
             "t": t,
             "js_messages": js_messages(locale),
+            "permissions": granted_permissions(user),
         }
+
+    @app.errorhandler(403)
+    def forbidden(error):
+        if request.path.startswith("/api/"):
+            return jsonify(error=t("error.forbidden")), 403
+        return render_template("error.html"), 403
 
     @app.after_request
     def add_security_headers(response):

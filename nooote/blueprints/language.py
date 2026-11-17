@@ -4,12 +4,14 @@ from flask import Blueprint, abort, redirect, request, url_for
 
 from ..extensions import db
 from ..i18n import normalize_locale, set_locale_cookie
+from ..permissions import permission_require
 from ..services import current_user, safe_redirect_target
 
 bp = Blueprint("language", __name__)
 
 
 @bp.post("/language")
+@permission_require(["language.switch"])
 def switch():
     locale = normalize_locale(request.form.get("locale"))
     if locale is None:

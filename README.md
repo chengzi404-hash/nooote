@@ -23,7 +23,7 @@
 
 <div align="center">
 
-**文档**　[快速开始](docs/QUICK_START.md) · [功能与界面](docs/FEATURES.md) · [Markdown 扩展](docs/MARKDOWN.md) · [HTTP API](docs/API.md) · [配置](docs/CONFIGURATION.md) · [项目结构](docs/PROJECT_STRUCTURE.md)
+**文档**　[快速开始](docs/QUICK_START.md) · [功能与界面](docs/FEATURES.md) · [Markdown 扩展](docs/MARKDOWN.md) · [HTTP API](docs/API.md) · [权限组](docs/PERMISSIONS.md) · [配置](docs/CONFIGURATION.md) · [项目结构](docs/PROJECT_STRUCTURE.md)
 
 **其他**　[贡献](CONTRIBUTING.md) · [行为准则](CODE_OF_CONDUCT.md) · [安全策略](SECURITY.md) · [许可证](LICENSE) · [English](README.en.md)
 

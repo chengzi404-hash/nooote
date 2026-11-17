@@ -17,16 +17,15 @@ from ..config import ATTACHMENT_CACHE_SECONDS, ATTACHMENT_ID_RE
 from ..extensions import db
 from ..i18n import t
 from ..models import Attachment
+from ..permissions import permission_require
 from ..services import (
     UploadError,
-    api_login_required,
     attachment_markdown,
     attachment_path,
     console_stats,
     current_user,
     get_owned_attachment,
     is_inline_image,
-    login_required,
     save_upload,
 )
 
@@ -34,7 +33,7 @@ bp = Blueprint("attachments", __name__)
 
 
 @bp.get("/console/attachments")
-@login_required
+@permission_require(["attachment.read"])
 def index():
     user = current_user()
     items = (
@@ -55,7 +54,7 @@ def index():
 
 
 @bp.post("/console/attachments")
-@login_required
+@permission_require(["attachment.write"])
 def upload():
     try:
         attachment = save_upload(request.files.get("file"))
@@ -68,7 +67,7 @@ def upload():
 
 
 @bp.post("/console/attachments/<attachment_id>/delete")
-@login_required
+@permission_require(["attachment.delete"])
 def delete_attachment(attachment_id: str):
     attachment = get_owned_attachment(attachment_id)
     path = attachment_path(attachment.id)
@@ -82,7 +81,7 @@ def delete_attachment(attachment_id: str):
 
 
 @bp.post("/api/console/attachments")
-@api_login_required
+@permission_require(["attachment.write"])
 def api_upload():
     try:
         attachment = save_upload(request.files.get("file"))
@@ -105,7 +104,7 @@ def api_upload():
 
 
 @bp.delete("/api/console/attachments/<attachment_id>")
-@api_login_required
+@permission_require(["attachment.delete"])
 def api_delete_attachment(attachment_id: str):
     attachment = get_owned_attachment(attachment_id)
     path = attachment_path(attachment.id)
@@ -118,6 +117,7 @@ def api_delete_attachment(attachment_id: str):
 
 
 @bp.get("/files/<attachment_id>")
+@permission_require(["files.view"])
 def serve_attachment(attachment_id: str):
     if not ATTACHMENT_ID_RE.fullmatch(attachment_id):
         abort(404)

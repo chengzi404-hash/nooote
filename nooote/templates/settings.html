@@ -73,6 +73,20 @@
     </span>
   </label>
 
+  <fieldset class="field">
+    <legend class="field-label">{{ t('settings.permissions') }}</legend>
+    <p class="permission-role">
+      <span class="badge private">{{ t('settings.role_' ~ current_user.role) }}</span>
+      <span class="field-hint">{{ t('settings.permissions_readonly') }}</span>
+    </p>
+    <p class="field-hint">{{ t('settings.permissions_hint') }}</p>
+    <ul class="permission-list" aria-label="{{ t('settings.permissions_granted') }}">
+      {% for name in permissions|sort %}
+      <li><code>{{ name }}</code></li>
+      {% endfor %}
+    </ul>
+  </fieldset>
+
   <div class="settings-actions">
     <button type="submit" class="btn primary">{{ icon("save", 15) }} {{ t('settings.save') }}</button>
     <a class="btn outline" href="{{ url_for('console.index') }}">{{ t('settings.back_console') }}</a>

@@ -28,6 +28,11 @@
       </a>
 
       <p class="nav-label">{{ t('console.account') }}</p>
+      {% if 'manage.view' in permissions %}
+      <a class="nav-link{% if active_nav == 'manage' %} is-active{% endif %}" href="{{ url_for('admin.manage') }}">
+        {{ icon("shield", 17) }}<span>{{ t('console.manage') }}</span>
+      </a>
+      {% endif %}
       <a class="nav-link{% if active_nav == 'settings' %} is-active{% endif %}" href="{{ url_for('console.settings') }}">
         {{ icon("settings", 17) }}<span>{{ t('console.settings') }}</span>
       </a>

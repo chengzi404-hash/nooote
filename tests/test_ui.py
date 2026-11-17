@@ -74,3 +74,47 @@ def test_editor_and_preview_scroll_in_sync(client):
     assert "scrollRatio" in script
     assert 'textarea.addEventListener("scroll"' in script
     assert 'preview.addEventListener("scroll"' in script
+
+
+def test_gantt_fences_are_rendered_as_diagrams(client):
+    script = client.get("/static/app.js").get_data(as_text=True)
+
+    assert 'new Set(["mermaid", "mmd", "gantt"])' in script
+    assert "diagramSource" in script
+    assert "diagramLanguage" in script
+    assert 'code.trimStart().startsWith("gantt")' in script
+    # A bare ```gantt fence gets the keyword Mermaid expects prepended.
+    assert "gantt\\n${code}" in script
+
+
+def test_gantt_uses_natural_width_and_its_own_theme(client):
+    script = client.get("/static/app.js").get_data(as_text=True)
+    css = client.get("/static/style.css").get_data(as_text=True)
+
+    assert "useMaxWidth: false" in script
+    assert '[data-kind="gantt"] svg' in css
+    assert "max-width: none" in css
+
+    for variable in (
+        "taskBkgColor",
+        "taskTextColor",
+        "activeTaskBkgColor",
+        "doneTaskBkgColor",
+        "critBkgColor",
+        "gridColor",
+        "sectionBkgColor",
+        "todayLineColor",
+    ):
+        assert variable in script
+
+
+def test_status_and_permission_styles_exist(client):
+    css = client.get("/static/style.css").get_data(as_text=True)
+
+    assert ".status-card" in css
+    assert ".permission-list" in css
+    assert ".role-form" in css
+    assert ".visually-hidden" in css
+    assert ".manage-section" in css
+    assert ".role-grid" in css
+

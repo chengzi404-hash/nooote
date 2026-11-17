@@ -11,7 +11,10 @@
 
 ## 功能清单
 
-- 用户系统：注册、登录、退出，密码以 Werkzeug 哈希存储；控制台、设置、笔记 API 与附件管理均需登录
+- 用户系统：注册、登录、退出，密码以 Werkzeug 哈希存储
+- 权限组：`guest` / `member` / `admin`，定义在 `nooote/config.py` 的 `ROLE_PERMISSIONS`；每个路由都用 `@permission_require([...])` 声明所需权限，由 `nooote/permissions.py` 的应用级 `before_request` 统一校验，未声明的视图默认拒绝
+- 权限不足时：`/api/**` 返回 JSON `401` / `403`，页面请求重定向到登录页或渲染 403 提示页；管理员在 `GET /manage` 调整其他账号的权限组（不能改自己）并查看站点数据
+- 注册默认获得 `member`；`NOOOTE_ADMIN_USERNAMES`（逗号分隔）中的用户名注册后直接获得 `admin`
 - 控制台：`GET /console` 管理当前账号的私有笔记，`GET /console/settings` 设置昵称、主题（跟随系统/浅色/深色）与新笔记默认公开
 - 图床与附件：`GET /console/attachments` 上传、复制链接、删除；编辑器内支持点击上传、拖拽或粘贴图片并自动插入 Markdown
 - 附件通过 `/files/<id>` 访问，图片内联显示、其他文件下载；链接不可猜测，但拿到链接即可访问
@@ -22,7 +25,8 @@
 - 每个代码块右上角有一键复制按钮，复制成功后图标短暂切换为对勾
 - LaTeX 数学公式（KaTeX）：行内 `$...$`、行间 `$$...$$`
 - GitHub 风格提示卡片（Note、Tip、Important、Warning、Caution）与 GFM 任务列表
-- Mermaid 图表直接预览：`mermaid` / `mmd` 代码块按需渲染为流程图、时序图、类图、状态图、ER 图、甘特图、饼图等，右上角按钮可在图表与源码之间切换
+- Mermaid 图表直接预览：`mermaid` / `mmd` / `gantt` 代码块按需渲染为流程图、时序图、类图、状态图、ER 图、甘特图、饼图等，右上角按钮可在图表与源码之间切换
+- 甘特图按自身宽度渲染、容器内横向滚动（不缩放，避免长周期项目文字过小），任务条按 `done` / `active` / `crit` 着色，深浅主题各一套配色
 - 深色模式、移动端上下分栏、页面进入动画与 View Transitions
 - Markdown 原始 HTML 由 DOMPurify 清洗后再渲染，CSP 仅允许同源脚本和样式
 - 中英双语界面：顶部「中 / EN」切换与设置页语言单选项，文案集中在 `nooote/i18n.py`；匿名访客用 `lang` cookie 记住，登录用户写入账号并优先于 cookie
@@ -36,7 +40,8 @@ nooote/
 ├── __init__.py          # 应用工厂、配置加载、安全响应头、启动时同步 vendor
 ├── config.py            # Config 默认值与共享常量（长度限制、正则、选项元组）
 ├── extensions.py        # SQLAlchemy 实例
-├── models.py            # User（账号与密码哈希）、Note、Attachment 模型
+├── models.py            # User（账号、密码哈希与权限组）、Note、Attachment 模型
+├── permissions.py       # permission_require 装饰器、权限组解析与默认拒绝守卫
 ├── services.py          # 用户、笔记、附件的领域逻辑
 ├── vendor.py            # vendor 资源清单、SHA-256 校验与自动下载
 ├── blueprints/
@@ -44,6 +49,7 @@ nooote/
 │   ├── auth.py          # 注册、登录与退出
 │   ├── console.py       # 控制台、私有笔记与用户设置
 │   ├── notes_api.py     # 笔记 JSON API
+│   ├── admin.py         # 站点管理页 /manage：站点数据与权限组分配
 │   └── attachments.py   # 图床、附件管理与文件读取
 ├── templates/           # 首页、登录注册、控制台、设置、附件、编辑器与公开页
 │   └── _icons.html      # 内联 SVG 图标宏
@@ -76,6 +82,7 @@ docs/                    # 用户文档：快速开始、功能、Markdown 扩�
 ## 约定
 
 - 后端只做存储与 JSON API，不要在服务端新增渲染接口
+- 新增路由必须加 `@permission_require([...])` 声明所需权限，权限名先登记到 `nooote/config.py` 的 `PERMISSIONS` 与 `ROLE_PERMISSIONS`；`tests/test_permissions.py` 会检查整个 `url_map` 是否有视图漏声明
 - 共享常量放进 `nooote/config.py`，避免散落魔法数字
 - 用户可见文案、文档使用中文；终端输出（Banner、日志）使用英文
 - UI 图标统一使用 Font Awesome（`<i class="fa-solid fa-...">`），不使用 emoji 字符

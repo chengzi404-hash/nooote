@@ -29,6 +29,53 @@ LOCALES = ("zh", "en")
 LOCALE_COOKIE = "lang"
 LOCALE_COOKIE_MAX_AGE = 60 * 60 * 24 * 365
 
+# Permission groups
+ROLE_MAX_LENGTH = 32
+ROLE_GUEST = "guest"
+ROLE_MEMBER = "member"
+ROLE_ADMIN = "admin"
+DEFAULT_ROLE = ROLE_MEMBER
+ROLES = (ROLE_MEMBER, ROLE_ADMIN)
+ADMIN_USERNAMES_ENV = "NOOOTE_ADMIN_USERNAMES"
+PERMISSIONS = (
+    "public.view",
+    "auth.access",
+    "auth.logout",
+    "language.switch",
+    "files.view",
+    "note.read",
+    "note.write",
+    "note.publish",
+    "note.delete",
+    "attachment.read",
+    "attachment.write",
+    "attachment.delete",
+    "settings.read",
+    "settings.write",
+    "manage.view",
+    "manage.users.write",
+)
+GUEST_PERMISSIONS = frozenset(
+    {"public.view", "auth.access", "language.switch", "files.view"}
+)
+MEMBER_PERMISSIONS = GUEST_PERMISSIONS | {
+    "auth.logout",
+    "note.read",
+    "note.write",
+    "note.publish",
+    "note.delete",
+    "attachment.read",
+    "attachment.write",
+    "attachment.delete",
+    "settings.read",
+    "settings.write",
+}
+ROLE_PERMISSIONS = {
+    ROLE_GUEST: GUEST_PERMISSIONS,
+    ROLE_MEMBER: frozenset(MEMBER_PERMISSIONS),
+    ROLE_ADMIN: frozenset(PERMISSIONS),
+}
+
 # Notes
 NOTE_ID_BYTES = 6
 NOTE_ID_MAX_LENGTH = 128

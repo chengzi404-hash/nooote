@@ -1978,6 +1978,19 @@ input[type="radio"]:focus-visible {
   margin: 0 auto;
 }
 
+.mermaid-diagram[data-kind="gantt"] {
+  scrollbar-width: thin;
+}
+
+.mermaid-diagram[data-kind="gantt"] svg {
+  max-width: none;
+  margin: 0;
+}
+
+.mermaid-diagram[data-kind="gantt"] svg text {
+  font-family: var(--font-sans);
+}
+
 .mermaid-diagram[data-state="loading"] {
   padding: 18px;
   background: var(--bg);
@@ -2371,6 +2384,182 @@ fieldset.field legend {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
+}
+
+.permission-role {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.permission-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 2px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.role-card .permission-list {
+  gap: 5px;
+}
+
+.permission-list li code {
+  display: inline-block;
+  padding: 3px 7px;
+  border: 1px solid var(--line);
+  border-radius: 0;
+  background: var(--code-bg);
+  color: var(--ink-2);
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+}
+
+/* =========================================================
+   Administration
+   ========================================================= */
+
+.manage-section {
+  margin: 0 0 34px;
+}
+
+.manage-section:last-child {
+  margin-bottom: 0;
+}
+
+.manage-section-title {
+  margin: 0 0 10px;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.manage-note {
+  margin: 0 0 14px;
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1.6;
+}
+
+.role-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.role-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 15px 16px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+}
+
+.role-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.role-count {
+  color: var(--muted);
+  font-size: 0.76rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.role-form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.role-form select {
+  height: 32px;
+  padding: 0 8px;
+  border: 1px solid var(--line-strong);
+  border-radius: 0;
+  background: var(--panel);
+  color: var(--ink);
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.role-form select:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  animation: focus-ring 0.4s ease-out;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  border: 0;
+  white-space: nowrap;
+}
+
+/* =========================================================
+   Status pages
+   ========================================================= */
+
+.status-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 24px;
+}
+
+.status-card {
+  max-width: 460px;
+  padding: 32px;
+  border: 1px solid var(--line);
+  border-radius: 0;
+  background: var(--panel);
+  text-align: center;
+  animation: page-in 0.4s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+.status-code {
+  margin: 0 0 6px;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.16em;
+}
+
+.status-card h1 {
+  margin: 0 0 10px;
+  font-size: 1.35rem;
+}
+
+.status-card p {
+  margin: 0 0 22px;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.status-actions {
+  display: flex;
+  justify-content: center;
+}
+
+.status-actions .btn {
+  text-decoration: none;
 }
 
 /* =========================================================

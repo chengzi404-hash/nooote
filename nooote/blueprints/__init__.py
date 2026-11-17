@@ -2,7 +2,7 @@
 
 from flask import Flask
 
-from . import attachments, auth, console, language, notes_api, public
+from . import admin, attachments, auth, console, language, notes_api, public
 
 
 def register_blueprints(app: Flask) -> None:
@@ -11,4 +11,5 @@ def register_blueprints(app: Flask) -> None:
     app.register_blueprint(console.bp)
     app.register_blueprint(notes_api.bp)
     app.register_blueprint(attachments.bp)
+    app.register_blueprint(admin.bp)
     app.register_blueprint(language.bp)

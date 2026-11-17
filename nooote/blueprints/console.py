@@ -7,6 +7,7 @@ from ..config import DEFAULT_THEME, DISPLAY_NAME_MAX_LENGTH, THEMES
 from ..extensions import db
 from ..i18n import normalize_locale, set_locale_cookie, t
 from ..models import Note, utcnow
+from ..permissions import permission_require
 from ..services import (
     console_stats,
     create_owned_note,
@@ -17,15 +18,8 @@ from ..services import (
 bp = Blueprint("console", __name__)
 
 
-@bp.before_request
-def require_login():
-    if current_user() is None:
-        if request.method == "GET":
-            return redirect(url_for("auth.login", next=request.path))
-        return redirect(url_for("auth.login"))
-
-
 @bp.get("/console")
+@permission_require(["note.read"])
 def index():
     user = current_user()
     notes = (
@@ -46,6 +40,7 @@ def index():
 
 
 @bp.post("/console/notes")
+@permission_require(["note.write"])
 def create_note():
     user = current_user()
     note = create_owned_note(user.id, is_public=user.default_public)
@@ -53,12 +48,14 @@ def create_note():
 
 
 @bp.get("/console/notes/<note_id>")
+@permission_require(["note.read"])
 def edit_note(note_id: str):
     note = get_owned_note(note_id)
     return render_template("note.html", note=note)
 
 
 @bp.post("/console/notes/<note_id>/publish")
+@permission_require(["note.publish"])
 def publish_note(note_id: str):
     note = get_owned_note(note_id)
     if not note.is_public:
@@ -69,6 +66,7 @@ def publish_note(note_id: str):
 
 
 @bp.post("/console/notes/<note_id>/unpublish")
+@permission_require(["note.publish"])
 def unpublish_note(note_id: str):
     note = get_owned_note(note_id)
     if note.is_public:
@@ -79,6 +77,7 @@ def unpublish_note(note_id: str):
 
 
 @bp.post("/console/notes/<note_id>/delete")
+@permission_require(["note.delete"])
 def delete_note(note_id: str):
     note = get_owned_note(note_id)
     db.session.delete(note)
@@ -87,6 +86,7 @@ def delete_note(note_id: str):
 
 
 @bp.get("/console/settings")
+@permission_require(["settings.read"])
 def settings():
     user = current_user()
     return render_template(
@@ -97,6 +97,7 @@ def settings():
 
 
 @bp.post("/console/settings")
+@permission_require(["settings.write"])
 def update_settings():
     user = current_user()
     display_name = (request.form.get("display_name") or "").strip()

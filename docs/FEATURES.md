@@ -4,6 +4,8 @@
 
 - `GET /console`：我的控制台，管理当前账号的私有笔记
 - 用户系统：注册、登录、退出，密码使用 Werkzeug 哈希存储；控制台、设置、笔记 API 与附件管理均需登录
+- 权限组：`guest` / `member` / `admin` 三组，每个路由都用 `@permission_require([...])` 声明所需权限，由服务端统一校验、默认拒绝；管理员可在 `GET /manage` 调整其他账号的权限组
+- `GET /manage`：站点管理页，展示账号、笔记、附件与占用空间等站点数据，并可分配权限组
 - `GET /console/settings`：用户设置，可设置昵称、外观主题（跟随系统/浅色/深色）与新笔记默认公开
 - `GET /console/attachments`：图床与附件管理，可上传、复制链接和删除文件
 - 编辑器内支持点击上传、拖拽或粘贴图片，自动插入 Markdown 图片或附件链接
@@ -15,7 +17,8 @@
 - 代码块语法高亮（highlight.js，支持常用语言，浅色/深色主题自动切换）
 - LaTeX 数学公式（KaTeX）：行内 `$...$`、行间 `$$...$$`，支持常用 LaTeX 语法
 - GitHub 风格提示卡片（Note、Tip、Important、Warning、Caution）和 GFM 任务列表样式
-- Mermaid 图表直接预览：`mermaid` 代码块自动渲染为流程图、时序图、类图、状态图、ER 图、甘特图、饼图等，右上角按钮可在图表与源码之间切换
+- Mermaid 图表直接预览：`mermaid` / `mmd` / `gantt` 代码块自动渲染为流程图、时序图、类图、状态图、ER 图、甘特图、饼图等，右上角按钮可在图表与源码之间切换
+- 甘特图按自身宽度渲染并支持横向滚动，任务条按 `done` / `active` / `crit` 状态着色，浅色与深色主题各有一套配色
 - 多语言代码块静态检查：JavaScript、Python、C/C++、Rust、Ruby、HTML、CSS、JSON、Java、PHP、Go、YAML，右上角显示通过/失败图标，点击展开行号、列号和错误详情
 - 检查器在浏览器端按需加载（Lezer 语法解析器 + Ruby 官方 Prism WASM），不会上传代码
 - 静态检查基于语法解析，重点报告语法/结构错误，不等同于各语言的完整 lint 规则集

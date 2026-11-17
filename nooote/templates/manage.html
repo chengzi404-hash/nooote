@@ -1,0 +1,112 @@
+{% extends "console_base.html" %}
+{% from "_icons.html" import icon %}
+
+{% block title %}{{ t('manage.page_title') }}{% endblock %}
+{% block crumb %}{{ t('manage.crumb') }}{% endblock %}
+
+{% block console_content %}
+<header class="console-header">
+  <div>
+    <p class="eyebrow">{{ t('manage.eyebrow') }}</p>
+    <h1>{{ t('manage.heading') }}</h1>
+    <p>{{ t('manage.lead') }}</p>
+  </div>
+</header>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  <ul class="flash-list">
+    {% for category, message in messages %}
+    <li class="flash flash-{{ category }}">{{ message }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+{% endwith %}
+
+<section class="manage-section" aria-labelledby="manage-stats-title">
+  <h2 id="manage-stats-title" class="manage-section-title">{{ t('manage.stats_title') }}</h2>
+  <div class="stat-grid">
+    <div class="stat">
+      <span>{{ t('manage.stat_users') }}</span>
+      <strong>{{ site.users }}</strong>
+    </div>
+    <div class="stat">
+      <span>{{ t('manage.stat_notes') }}</span>
+      <strong>{{ site.notes }}</strong>
+    </div>
+    <div class="stat">
+      <span>{{ t('manage.stat_public') }}</span>
+      <strong>{{ site.public_notes }}</strong>
+    </div>
+    <div class="stat">
+      <span>{{ t('manage.stat_private') }}</span>
+      <strong>{{ site.private_notes }}</strong>
+    </div>
+    <div class="stat">
+      <span>{{ t('manage.stat_attachments') }}</span>
+      <strong>{{ site.attachments }}</strong>
+    </div>
+    <div class="stat">
+      <span>{{ t('manage.stat_storage') }}</span>
+      <strong>{{ (site.note_bytes + site.attachment_bytes)|filesizeformat }}</strong>
+    </div>
+  </div>
+  <p class="manage-note">
+    {{ t('manage.storage_detail', notes=site.note_bytes|filesizeformat, attachments=site.attachment_bytes|filesizeformat) }}
+  </p>
+</section>
+
+<section class="manage-section" aria-labelledby="manage-roles-title">
+  <h2 id="manage-roles-title" class="manage-section-title">{{ t('manage.groups_title') }}</h2>
+  <p class="manage-note">{{ t('manage.groups_lead') }}</p>
+  <div class="role-grid">
+    {% for role in roles %}
+    <article class="role-card">
+      <header class="role-card-head">
+        <span class="badge {% if role == 'admin' %}public{% else %}private{% endif %}">{{ t('settings.role_' ~ role) }}</span>
+        <span class="role-count">{{ t('manage.role_members', count=site.role_counts[role]) }}</span>
+      </header>
+      <ul class="permission-list">
+        {% for name in role_permissions[role] %}
+        <li><code>{{ name }}</code></li>
+        {% endfor %}
+      </ul>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="manage-section" aria-labelledby="manage-users-title">
+  <h2 id="manage-users-title" class="manage-section-title">{{ t('manage.users_title') }}</h2>
+  <p class="manage-note">{{ t('manage.users_lead') }}</p>
+  <ul class="note-list">
+    {% for item in users %}
+    <li class="note-row">
+      <div class="note-main">
+        <span class="note-title">{{ item.username }}</span>
+        <span class="note-meta">
+          <span class="badge {% if item.role == 'admin' %}public{% else %}private{% endif %}">{{ t('settings.role_' ~ item.role) }}</span>
+          <span aria-hidden="true">·</span>
+          {{ t('manage.joined') }} <time data-relative datetime="{{ item.created_at|iso_utc }}">{{ item.created_at|iso_utc }}</time>
+        </span>
+      </div>
+      <div class="note-actions">
+        {% if item.id == current_user.id %}
+        <span class="field-hint">{{ t('manage.self_role') }}</span>
+        {% else %}
+        <form method="post" action="{{ url_for('admin.update_role', user_id=item.id) }}" class="role-form">
+          <label class="visually-hidden" for="role-{{ item.id }}">{{ t('manage.change_role') }}</label>
+          <select id="role-{{ item.id }}" name="role">
+            {% for code in roles %}
+            <option value="{{ code }}" {% if item.role == code %}selected{% endif %}>{{ t('settings.role_' ~ code) }}</option>
+            {% endfor %}
+          </select>
+          <button type="submit" class="btn small outline">{{ t('manage.save_role') }}</button>
+        </form>
+        {% endif %}
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
+</section>
+{% endblock %}

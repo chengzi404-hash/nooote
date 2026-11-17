@@ -7,7 +7,8 @@ nooote/
 ├── config.py            # 配置默认值与共享常量
 ├── extensions.py        # SQLAlchemy 实例
 ├── i18n.py              # 中英文案目录与语言解析
-├── models.py            # User（账号与密码哈希）、Note 与 Attachment 模型
+├── models.py            # User（账号、密码哈希与权限组）、Note 与 Attachment 模型
+├── permissions.py       # permission_require 装饰器、权限组与默认拒绝守卫
 ├── services.py          # 用户、笔记与附件的领域逻辑
 ├── vendor.py            # vendor 资源清单、校验与自动同步
 ├── blueprints/
@@ -15,6 +16,7 @@ nooote/
 │   ├── auth.py          # 注册、登录与退出
 │   ├── console.py       # 控制台、私有笔记与用户设置
 │   ├── notes_api.py     # 笔记 JSON API
+│   ├── admin.py         # 站点管理页 /manage：站点数据与权限组分配
 │   ├── language.py      # 界面语言切换
 │   └── attachments.py   # 图床、附件管理与文件读取
 ├── templates/           # 首页、登录注册、控制台、设置、附件、编辑与公开页

@@ -83,7 +83,8 @@ git push origin known-good-26111015
 ## 代码约定
 
 - 遵循现有结构：后端保持轻量，只负责存储和 JSON API；Markdown 渲染、代码高亮、图表都在浏览器端完成
-- 新增用户可见功能时，同步更新 [AGENTS.md](AGENTS.md) 并补充 pytest 测试
+- 新增路由必须用 `@permission_require([...])` 声明所需权限，并把权限名登记到 `nooote/config.py` 的 `PERMISSIONS` 与 `ROLE_PERMISSIONS`；`tests/test_permissions.py` 会检查 `url_map` 中是否有视图漏声明
+- 新增用户可见功能时，同步更新 [AGENTS.md](AGENTS.md) 与 `docs/` 下的相关文档，并补充 pytest 测试
 - 面向用户的文档同时维护中文 `README.md` 和英文 `README.en.md`，改动时保持两边一致
 - 前端第三方库放入 `nooote/static/vendor/`，保留其 LICENSE 并在 vendor README 中登记，不要使用 CDN
 - `static/vendor/` 已被 git 忽略：启动服务或运行 `uv run python -m nooote.vendor` 会自动下载缺失文件，新增或升级第三方库时同步更新 `nooote/vendor.py` 中的 URL 与 SHA-256；详见 [AGENTS.md](AGENTS.md#前端第三方库自动同步)

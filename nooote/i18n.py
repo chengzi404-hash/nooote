@@ -164,6 +164,7 @@ MESSAGES: dict[str, dict[str, str]] = {
         "console.attachments": "图床与附件",
         "console.account": "账户",
         "console.settings": "用户设置",
+        "console.manage": "站点管理",
         "console.back_home": "返回首页",
         "console.overview_aria": "笔记概览",
         "console.overview_title": "笔记概览",
@@ -224,6 +225,40 @@ MESSAGES: dict[str, dict[str, str]] = {
         ),
         "settings.save": "保存设置",
         "settings.back_console": "返回控制台",
+        "settings.permissions": "权限组",
+        "settings.role_member": "成员",
+        "settings.role_admin": "管理员",
+        "settings.role_guest": "访客",
+        "settings.permissions_hint": (
+            "账号所在权限组决定可访问的页面与接口，权限由服务端统一校验。"
+        ),
+        "settings.permissions_granted": "已授予权限",
+        "settings.permissions_readonly": "权限组由管理员分配，无法在设置页修改。",
+        # ---------- management ----------
+        "manage.page_title": "站点管理 · Nooote",
+        "manage.crumb": "站点管理",
+        "manage.eyebrow": "Administration",
+        "manage.heading": "站点管理",
+        "manage.lead": "查看站点数据总览，并为每个账号分配权限组。",
+        "manage.stats_title": "站点数据",
+        "manage.stat_users": "账号",
+        "manage.stat_notes": "笔记",
+        "manage.stat_public": "公开笔记",
+        "manage.stat_private": "私有笔记",
+        "manage.stat_attachments": "附件",
+        "manage.stat_storage": "占用空间",
+        "manage.storage_detail": "笔记正文 {notes} · 附件 {attachments}",
+        "manage.groups_title": "权限组",
+        "manage.groups_lead": "下列权限在服务端统一校验，路由必须声明所需权限才会放行。",
+        "manage.role_members": "{count} 个账号",
+        "manage.users_title": "账号与权限组",
+        "manage.users_lead": "管理员可以调整其他账号的权限组，不能修改自己的权限组。",
+        "manage.joined": "注册于",
+        "manage.change_role": "修改权限组",
+        "manage.save_role": "保存",
+        "manage.self_role": "不能修改自己的权限组",
+        "manage.role_updated": "已更新 {username} 的权限组",
+        "manage.error_self_role": "不能修改自己的权限组，请让其他管理员操作",
         # ---------- attachments ----------
         "attachments.page_title": "图床与附件 · Nooote",
         "attachments.crumb": "图床与附件",
@@ -300,6 +335,11 @@ MESSAGES: dict[str, dict[str, str]] = {
         "error.content_required": '请求体需为包含 "content" 字符串的 JSON',
         "error.content_too_large": "笔记内容过大",
         "error.auth_required": "请先登录",
+        "error.forbidden": "没有权限执行该操作",
+        "error.forbidden_title": "403 · Nooote",
+        "error.forbidden_heading": "没有访问权限",
+        "error.forbidden_body": "当前账号所在的权限组不包含访问该页面的权限。",
+        "error.back_home": "返回首页",
         "upload.file_required": "请选择要上传的文件",
         "upload.file_too_large": "文件过大，超出上传上限",
         "upload.file_empty": "文件为空",
@@ -476,6 +516,7 @@ MESSAGES: dict[str, dict[str, str]] = {
         "console.attachments": "Files & images",
         "console.account": "Account",
         "console.settings": "Settings",
+        "console.manage": "Site management",
         "console.back_home": "Back to home",
         "console.overview_aria": "Note overview",
         "console.overview_title": "Overview",
@@ -538,6 +579,50 @@ MESSAGES: dict[str, dict[str, str]] = {
         ),
         "settings.save": "Save settings",
         "settings.back_console": "Back to console",
+        "settings.permissions": "Permission group",
+        "settings.role_member": "Member",
+        "settings.role_admin": "Administrator",
+        "settings.role_guest": "Guest",
+        "settings.permissions_hint": (
+            "The permission group on your account decides which pages and APIs you can "
+            "reach; every request is checked on the server."
+        ),
+        "settings.permissions_granted": "Granted permissions",
+        "settings.permissions_readonly": (
+            "Groups are assigned by an administrator and cannot be changed here."
+        ),
+        # ---------- management ----------
+        "manage.page_title": "Site management · Nooote",
+        "manage.crumb": "Site management",
+        "manage.eyebrow": "Administration",
+        "manage.heading": "Site management",
+        "manage.lead": "Review site-wide statistics and assign permission groups to accounts.",
+        "manage.stats_title": "Site statistics",
+        "manage.stat_users": "Accounts",
+        "manage.stat_notes": "Notes",
+        "manage.stat_public": "Public notes",
+        "manage.stat_private": "Private notes",
+        "manage.stat_attachments": "Files",
+        "manage.stat_storage": "Storage",
+        "manage.storage_detail": "Note text {notes} · attachments {attachments}",
+        "manage.groups_title": "Permission groups",
+        "manage.groups_lead": (
+            "These permissions are checked on the server; a route is only reachable "
+            "when it declares them."
+        ),
+        "manage.role_members": "{count} accounts",
+        "manage.users_title": "Accounts & permission groups",
+        "manage.users_lead": (
+            "Administrators can change another account's group but never their own."
+        ),
+        "manage.joined": "Joined",
+        "manage.change_role": "Change permission group",
+        "manage.save_role": "Save",
+        "manage.self_role": "You cannot change your own group",
+        "manage.role_updated": "Updated the permission group for {username}",
+        "manage.error_self_role": (
+            "You cannot change your own permission group; ask another administrator."
+        ),
         # ---------- attachments ----------
         "attachments.page_title": "Files & images · Nooote",
         "attachments.crumb": "Files & images",
@@ -617,6 +702,13 @@ MESSAGES: dict[str, dict[str, str]] = {
         "error.content_required": 'Expected JSON body with a "content" string',
         "error.content_too_large": "Note content is too large",
         "error.auth_required": "Authentication required",
+        "error.forbidden": "You do not have permission to do that",
+        "error.forbidden_title": "403 · Nooote",
+        "error.forbidden_heading": "Access denied",
+        "error.forbidden_body": (
+            "The permission group on your account does not include access to this page."
+        ),
+        "error.back_home": "Back to home",
         "upload.file_required": "Choose a file to upload",
         "upload.file_too_large": "The file exceeds the upload limit",
         "upload.file_empty": "The file is empty",

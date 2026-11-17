@@ -18,6 +18,7 @@ from ..config import (
 from ..extensions import db
 from ..i18n import t
 from ..models import User
+from ..permissions import initial_role, permission_require
 from ..services import (
     current_user,
     login_user,
@@ -29,6 +30,7 @@ bp = Blueprint("auth", __name__)
 
 
 @bp.route("/login", methods=["GET", "POST"])
+@permission_require(["auth.access"])
 def login():
     if current_user() is not None:
         return redirect(url_for("console.index"))
@@ -58,6 +60,7 @@ def login():
 
 
 @bp.route("/register", methods=["GET", "POST"])
+@permission_require(["auth.access"])
 def register():
     if current_user() is not None:
         return redirect(url_for("console.index"))
@@ -87,6 +90,7 @@ def register():
                 id=secrets.token_urlsafe(USER_ID_BYTES),
                 username=username,
                 password_hash=generate_password_hash(password),
+                role=initial_role(username),
             )
             db.session.add(user)
             try:
@@ -105,6 +109,7 @@ def register():
 
 
 @bp.post("/logout")
+@permission_require(["auth.logout"])
 def logout():
     logout_user()
     return redirect(url_for("public.index"))

@@ -380,7 +380,18 @@
     });
   }
 
-  const MERMAID_LANGUAGES = new Set(["mermaid", "mmd"]);
+  const DIAGRAM_LANGUAGES = new Set(["mermaid", "mmd", "gantt"]);
+
+  function diagramLanguage(codeBlock) {
+    const language = languageOf(codeBlock);
+    return language === "gantt" ? "gantt" : "mermaid";
+  }
+
+  function diagramSource(codeBlock) {
+    const code = codeBlock.textContent;
+    if (languageOf(codeBlock) !== "gantt") return code;
+    return code.trimStart().startsWith("gantt") ? code : `gantt\n${code}`;
+  }
   const MERMAID_VIEW_ACTIONS = {
     diagram: { icon: "code", key: "js.view_code" },
     code: { icon: "diagram-project", key: "js.view_diagram" },
@@ -394,6 +405,23 @@
     secondaryColor: "#1e1533",
     tertiaryColor: "#12261e",
     edgeLabelBackground: "#1f1f24",
+    taskBkgColor: "#243a63",
+    taskBorderColor: "#6ea8fe",
+    taskTextColor: "#e9e9e6",
+    taskTextLightColor: "#e9e9e6",
+    taskTextDarkColor: "#d5d3cc",
+    taskTextOutsideColor: "#d5d3cc",
+    activeTaskBkgColor: "#3b5ba8",
+    activeTaskBorderColor: "#8fb6ff",
+    doneTaskBkgColor: "#2c3548",
+    doneTaskBorderColor: "#6b7789",
+    critBkgColor: "#7a2b34",
+    critBorderColor: "#ff8a92",
+    gridColor: "#3b3b46",
+    sectionBkgColor: "#1a1f2e",
+    altSectionBkgColor: "#14161f",
+    sectionBkgColor2: "#1a1f2e",
+    todayLineColor: "#8fa2ff",
     pie1: "#3b82f6",
     pie2: "#22c55e",
     pie3: "#f59e0b",
@@ -463,7 +491,7 @@
       && window.matchMedia("(prefers-color-scheme: dark)").matches;
   }
 
-  async function renderMermaidDiagram(container, code, key) {
+  async function renderMermaidDiagram(container, code, key, kind) {
     if (!container.isConnected) return;
 
     try {
@@ -477,6 +505,9 @@
         theme: dark ? "dark" : "default",
         themeVariables: dark ? MERMAID_DARK_THEME : {},
         fontFamily: getComputedStyle(document.body).fontFamily,
+        ...(kind === "gantt"
+          ? { gantt: { useMaxWidth: false, fontSize: 12, sectionFontSize: 12 } }
+          : {}),
       });
 
       await mermaid.parse(code);
@@ -488,6 +519,7 @@
 
       container.innerHTML = svg;
       container.dataset.state = "ready";
+      if (kind === "gantt") container.dataset.kind = "gantt";
       cacheMermaidSvg(key, svg);
       if (typeof bindFunctions === "function") bindFunctions(container);
     } catch (error) {
@@ -507,9 +539,9 @@
     }
   }
 
-  function queueMermaidRender(container, code, key) {
+  function queueMermaidRender(container, code, key, kind) {
     mermaidQueue = mermaidQueue
-      .then(() => renderMermaidDiagram(container, code, key))
+      .then(() => renderMermaidDiagram(container, code, key, kind))
       .catch(() => {
         /* renderMermaidDiagram reports its own errors. */
       });
@@ -571,12 +603,13 @@
     let index = 0;
 
     preview.querySelectorAll("pre code").forEach((codeBlock) => {
-      if (!MERMAID_LANGUAGES.has(languageOf(codeBlock))) return;
+      if (!DIAGRAM_LANGUAGES.has(languageOf(codeBlock))) return;
 
       const pre = codeBlock.closest("pre");
       if (!pre) return;
 
-      const code = codeBlock.textContent;
+      const code = diagramSource(codeBlock);
+      const kind = diagramLanguage(codeBlock);
       const key = `${isDarkTheme() ? "dark" : "light"}:${index}:${code}`;
       index += 1;
 
@@ -588,10 +621,11 @@
       if (cached) {
         container.innerHTML = cached;
         container.dataset.state = "ready";
+        if (kind === "gantt") container.dataset.kind = "gantt";
         return;
       }
 
-      queueMermaidRender(container, code, key);
+      queueMermaidRender(container, code, key, kind);
     });
   }
 

@@ -1,8 +1,10 @@
 import sqlite3
 
+from sqlalchemy import select
+
 from nooote import _load_or_create_secret, create_app
 from nooote.extensions import db
-from nooote.models import Note
+from nooote.models import Note, User
 
 
 def create_note(client) -> str:
@@ -396,6 +398,12 @@ def test_legacy_user_columns_are_migrated(tmp_path):
     )
     assert response.status_code == 302
     assert client.get("/console").status_code == 200
+
+    with app.app_context():
+        role = db.session.execute(
+            select(User.role).where(User.id == "old")
+        ).scalar_one()
+        assert role == "member"
 
 
 def test_secret_key_is_persisted(tmp_path):
