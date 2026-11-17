@@ -47,10 +47,32 @@
   <section class="pane editor-pane">
     <div class="pane-label">
       <span id="editor-label">{{ t('editor.edit') }}</span>
-      <span class="pane-tools">
-        <button type="button" class="btn small subtle" data-upload-trigger>{{ icon("image", 14) }} {{ t('editor.upload') }}</button>
+    </div>
+    <div class="editor-toolbar" role="toolbar" aria-label="{{ t('editor.toolbar') }}" data-editor-toolbar>
+      <div class="toolbar-group">
+        <button type="button" class="tool-btn" data-md-action="bold" aria-label="{{ t('editor.bold') }}" title="{{ t('editor.bold') }}"><i class="fa-solid fa-bold" aria-hidden="true"></i></button>
+        <button type="button" class="tool-btn" data-md-action="italic" aria-label="{{ t('editor.italic') }}" title="{{ t('editor.italic') }}"><i class="fa-solid fa-italic" aria-hidden="true"></i></button>
+        <button type="button" class="tool-btn" data-md-action="strikethrough" aria-label="{{ t('editor.strikethrough') }}" title="{{ t('editor.strikethrough') }}"><i class="fa-solid fa-strikethrough" aria-hidden="true"></i></button>
+        <button type="button" class="tool-btn" data-md-action="inline-code" aria-label="{{ t('editor.inline_code') }}" title="{{ t('editor.inline_code') }}"><i class="fa-solid fa-code" aria-hidden="true"></i></button>
+      </div>
+      <span class="toolbar-divider" aria-hidden="true"></span>
+      <div class="toolbar-group">
+        <button type="button" class="tool-btn" data-md-action="heading" aria-label="{{ t('editor.heading') }}" title="{{ t('editor.heading') }}"><i class="fa-solid fa-heading" aria-hidden="true"></i></button>
+        <button type="button" class="tool-btn" data-md-action="quote" aria-label="{{ t('editor.quote') }}" title="{{ t('editor.quote') }}"><i class="fa-solid fa-quote-left" aria-hidden="true"></i></button>
+        <button type="button" class="tool-btn" data-md-action="bullet-list" aria-label="{{ t('editor.bullet_list') }}" title="{{ t('editor.bullet_list') }}"><i class="fa-solid fa-list-ul" aria-hidden="true"></i></button>
+        <button type="button" class="tool-btn" data-md-action="numbered-list" aria-label="{{ t('editor.numbered_list') }}" title="{{ t('editor.numbered_list') }}"><i class="fa-solid fa-list-ol" aria-hidden="true"></i></button>
+        <button type="button" class="tool-btn" data-md-action="task-list" aria-label="{{ t('editor.task_list') }}" title="{{ t('editor.task_list') }}"><i class="fa-solid fa-list-check" aria-hidden="true"></i></button>
+      </div>
+      <span class="toolbar-divider" aria-hidden="true"></span>
+      <div class="toolbar-group">
+        <button type="button" class="tool-btn" data-md-action="link" aria-label="{{ t('editor.link') }}" title="{{ t('editor.link') }}"><i class="fa-solid fa-link" aria-hidden="true"></i></button>
+        <button type="button" class="tool-btn" data-upload-trigger aria-label="{{ t('editor.upload') }}" title="{{ t('editor.upload') }}"><i class="fa-solid fa-image" aria-hidden="true"></i></button>
+        <button type="button" class="tool-btn" data-md-action="code-block" aria-label="{{ t('editor.code_block') }}" title="{{ t('editor.code_block') }}"><i class="fa-solid fa-file-code" aria-hidden="true"></i></button>
+        <button type="button" class="tool-btn" data-md-action="table" aria-label="{{ t('editor.table') }}" title="{{ t('editor.table') }}"><i class="fa-solid fa-table" aria-hidden="true"></i></button>
+        <button type="button" class="tool-btn" data-md-action="divider" aria-label="{{ t('editor.divider') }}" title="{{ t('editor.divider') }}"><i class="fa-solid fa-minus" aria-hidden="true"></i></button>
+        <button type="button" class="tool-btn" data-md-action="formula" aria-label="{{ t('editor.formula') }}" title="{{ t('editor.formula') }}"><i class="fa-solid fa-square-root-variable" aria-hidden="true"></i></button>
         <input type="file" data-upload-input hidden multiple>
-      </span>
+      </div>
     </div>
     <textarea id="editor" aria-labelledby="editor-label" spellcheck="true"
               placeholder="{{ t('editor.placeholder') }}" autofocus>{{ note.content }}</textarea>

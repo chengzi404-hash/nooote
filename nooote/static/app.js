@@ -382,9 +382,10 @@
 
   const DIAGRAM_LANGUAGES = new Set(["mermaid", "mmd", "gantt"]);
 
-  function diagramLanguage(codeBlock) {
+  function diagramLanguage(codeBlock, code) {
     const language = languageOf(codeBlock);
-    return language === "gantt" ? "gantt" : "mermaid";
+    if (language === "gantt") return "gantt";
+    return code.trimStart().startsWith("gantt") ? "gantt" : "mermaid";
   }
 
   function diagramSource(codeBlock) {
@@ -609,7 +610,7 @@
       if (!pre) return;
 
       const code = diagramSource(codeBlock);
-      const kind = diagramLanguage(codeBlock);
+      const kind = diagramLanguage(codeBlock, code);
       const key = `${isDarkTheme() ? "dark" : "light"}:${index}:${code}`;
       index += 1;
 
@@ -757,6 +758,192 @@
       textarea.setRangeText(`${prefix}${snippet}\n`, start, end, "end");
       textarea.focus();
       textarea.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+
+    function applyEdit(text, selectionStart, selectionEnd) {
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      textarea.setRangeText(text, start, end, "end");
+      if (typeof selectionStart === "number") {
+        textarea.setSelectionRange(
+          start + selectionStart,
+          start + (typeof selectionEnd === "number" ? selectionEnd : selectionStart)
+        );
+      }
+      textarea.focus();
+      textarea.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+
+    function wrapInline(marker) {
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const selected = textarea.value.slice(start, end);
+      const size = marker.length;
+      const before = textarea.value.slice(Math.max(0, start - size), start);
+      const after = textarea.value.slice(end, end + size);
+
+      if (before === marker && after === marker) {
+        textarea.setSelectionRange(start - size, end + size);
+        applyEdit(selected, 0, selected.length);
+        return;
+      }
+
+      if (!selected) {
+        applyEdit(marker + marker, size, size);
+        return;
+      }
+
+      applyEdit(marker + selected + marker, size, size + selected.length);
+    }
+
+    function lineRange() {
+      const value = textarea.value;
+      const start = value.lastIndexOf("\n", textarea.selectionStart - 1) + 1;
+      let end = textarea.selectionEnd;
+      if (end > start && value[end - 1] === "\n") end -= 1;
+      const next = value.indexOf("\n", end);
+      return [start, next === -1 ? value.length : next];
+    }
+
+    function applyLinePrefix(prefix, pattern) {
+      const [start, end] = lineRange();
+      const lines = textarea.value.slice(start, end).split("\n");
+      const matches = pattern
+        ? (line) => pattern.test(line)
+        : (line) => line.startsWith(prefix);
+      const content = lines.filter((line) => line.length > 0);
+      const all = content.length > 0 && content.every(matches);
+      if (content.length === 0 && lines.length > 1) return;
+
+      const next = lines.map((line) => {
+        if (line.length === 0) return lines.length === 1 ? prefix : line;
+        if (!all) return prefix + line;
+        return pattern ? line.replace(pattern, "") : line.slice(prefix.length);
+      }).join("\n");
+
+      textarea.setSelectionRange(start, end);
+      applyEdit(next, 0, next.length);
+    }
+
+    function applyOrderedList() {
+      const [start, end] = lineRange();
+      const lines = textarea.value.slice(start, end).split("\n");
+      const pattern = /^\d+\.\s+/;
+      const content = lines.filter((line) => line.length > 0);
+      const all = content.length > 0 && content.every((line) => pattern.test(line));
+      if (content.length === 0 && lines.length > 1) return;
+
+      let index = 0;
+      const next = lines.map((line) => {
+        if (line.length === 0) return lines.length === 1 ? "1. " : line;
+        if (all) return line.replace(pattern, "");
+        index += 1;
+        return `${index}. ${line}`;
+      }).join("\n");
+
+      textarea.setSelectionRange(start, end);
+      applyEdit(next, 0, next.length);
+    }
+
+    function insertBlock(text, startOffset = text.length, endOffset = startOffset) {
+      const before = textarea.value.slice(0, textarea.selectionStart);
+      let padding = "";
+      if (before.length > 0) {
+        padding = before.endsWith("\n\n") ? "" : before.endsWith("\n") ? "\n" : "\n\n";
+      }
+      applyEdit(padding + text, padding.length + startOffset, padding.length + endOffset);
+    }
+
+    function insertLink() {
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const selected = textarea.value.slice(start, end);
+      const label = selected || tx("js.editor_link_text");
+      const url = "https://";
+      const snippet = `[${label}](${url})`;
+      const urlStart = label.length + 3;
+
+      if (selected) {
+        applyEdit(snippet, urlStart, urlStart + url.length);
+      } else {
+        applyEdit(snippet, 1, 1 + label.length);
+      }
+    }
+
+    function insertCodeBlock() {
+      const selected = textarea.value.slice(textarea.selectionStart, textarea.selectionEnd);
+      if (!selected) {
+        insertBlock("```\n\n```\n", 4, 4);
+        return;
+      }
+      insertBlock(`\`\`\`\n${selected}\n\`\`\`\n`, 4, 4 + selected.length);
+    }
+
+    function insertTable() {
+      const first = tx("js.editor_table_col", { n: 1 });
+      const second = tx("js.editor_table_col", { n: 2 });
+      const cell = tx("js.editor_table_cell");
+      const text = `| ${first} | ${second} |\n| --- | --- |\n| ${cell} | ${cell} |\n`;
+      insertBlock(text, 2, 2 + first.length);
+    }
+
+    const editorToolbar = document.querySelector("[data-editor-toolbar]");
+    if (editorToolbar) {
+      editorToolbar.addEventListener("mousedown", (event) => {
+        if (event.target.closest("button")) event.preventDefault();
+      });
+
+      editorToolbar.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-md-action]");
+        if (!button) return;
+
+        switch (button.dataset.mdAction) {
+          case "bold":
+            wrapInline("**");
+            break;
+          case "italic":
+            wrapInline("*");
+            break;
+          case "strikethrough":
+            wrapInline("~~");
+            break;
+          case "inline-code":
+            wrapInline("`");
+            break;
+          case "formula":
+            wrapInline("$");
+            break;
+          case "heading":
+            applyLinePrefix("## ", /^#{1,6}\s+/);
+            break;
+          case "quote":
+            applyLinePrefix("> ");
+            break;
+          case "bullet-list":
+            applyLinePrefix("- ", /^- (?!\[[ xX]\]\s)/);
+            break;
+          case "numbered-list":
+            applyOrderedList();
+            break;
+          case "task-list":
+            applyLinePrefix("- [ ] ", /^- \[[ xX]\]\s+/);
+            break;
+          case "link":
+            insertLink();
+            break;
+          case "code-block":
+            insertCodeBlock();
+            break;
+          case "table":
+            insertTable();
+            break;
+          case "divider":
+            insertBlock("---\n");
+            break;
+          default:
+            break;
+        }
+      });
     }
 
     async function uploadFiles(files) {

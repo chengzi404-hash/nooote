@@ -87,6 +87,14 @@ def test_gantt_fences_are_rendered_as_diagrams(client):
     assert "gantt\\n${code}" in script
 
 
+def test_gantt_inside_mermaid_fence_gets_gantt_treatment(client):
+    script = client.get("/static/app.js").get_data(as_text=True)
+
+    # A ```mermaid fence whose first line is `gantt` is still a Gantt chart.
+    assert 'code.trimStart().startsWith("gantt") ? "gantt" : "mermaid"' in script
+    assert "diagramLanguage(codeBlock, code)" in script
+
+
 def test_gantt_uses_natural_width_and_its_own_theme(client):
     script = client.get("/static/app.js").get_data(as_text=True)
     css = client.get("/static/style.css").get_data(as_text=True)
@@ -106,6 +114,29 @@ def test_gantt_uses_natural_width_and_its_own_theme(client):
         "todayLineColor",
     ):
         assert variable in script
+
+
+def test_editor_has_quick_formatting_toolbar(auth_client):
+    response = auth_client.post("/console/notes")
+    note_id = response.headers["Location"].rsplit("/", 1)[-1]
+    page = auth_client.get(f"/console/notes/{note_id}").get_data(as_text=True)
+    script = auth_client.get("/static/app.js").get_data(as_text=True)
+    css = auth_client.get("/static/style.css").get_data(as_text=True)
+
+    assert "data-editor-toolbar" in page
+    assert 'data-md-action="bold"' in page
+    assert 'data-md-action="task-list"' in page
+    assert 'data-md-action="table"' in page
+    assert "fa-solid fa-bold" in page
+    assert "快捷编辑工具" in page
+
+    assert "wrapInline" in script
+    assert "applyLinePrefix" in script
+    assert "applyOrderedList" in script
+    assert "insertLink" in script
+    assert 'case "task-list"' in script
+    assert ".editor-toolbar" in css
+    assert ".tool-btn" in css
 
 
 def test_status_and_permission_styles_exist(client):

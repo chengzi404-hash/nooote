@@ -1636,15 +1636,67 @@ input[type="radio"]:focus-visible {
   text-transform: uppercase;
 }
 
-.pane-tools {
+.editor-toolbar {
   display: flex;
+  flex: none;
   align-items: center;
-  gap: 8px;
+  gap: 2px;
+  padding: 5px 12px;
+  border-bottom: 1px solid var(--line);
+  background: var(--panel-2);
+  overflow-x: auto;
+  scrollbar-width: thin;
 }
 
-.pane-tools .btn {
-  letter-spacing: normal;
-  text-transform: none;
+.toolbar-group {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 2px;
+}
+
+.toolbar-divider {
+  flex: none;
+  width: 1px;
+  height: 18px;
+  margin: 0 7px;
+  background: var(--line);
+}
+
+.tool-btn {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 0.18s ease, border-color 0.18s ease,
+    color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.tool-btn:hover {
+  border-color: var(--line-strong);
+  background: var(--bg);
+  color: var(--ink);
+}
+
+.tool-btn:active {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.tool-btn:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--focus-ring);
 }
 
 #editor {
