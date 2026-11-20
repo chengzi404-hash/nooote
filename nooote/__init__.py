@@ -13,6 +13,8 @@ from .config import (
     DEFAULT_ROLE,
     LOCALES,
     LOCALE_MAX_LENGTH,
+    PLUGIN_REGISTRY_FILE,
+    PLUGINS_FOLDER_NAME,
     ROLE_MAX_LENGTH,
     SECRET_KEY_BYTES,
     SECRET_KEY_FILE,
@@ -25,6 +27,7 @@ from .i18n import current_locale, html_lang, js_messages, t
 from .models import User, iso_utc
 from .navigation import console_nav_view, register_default_nav
 from .permissions import enforce_permissions, granted_permissions
+from .plugins import install_plugins
 from .vendor import sync_app as sync_vendor_assets
 
 
@@ -112,6 +115,12 @@ def create_app(test_config: dict | None = None) -> Flask:
     app.config.update(
         SQLALCHEMY_DATABASE_URI=os.environ.get("DATABASE_URL", DEFAULT_DATABASE_URI),
         UPLOAD_FOLDER=os.path.join(app.instance_path, UPLOAD_FOLDER_NAME),
+        PLUGINS_FOLDER=os.path.join(
+            os.path.dirname(app.root_path), PLUGINS_FOLDER_NAME
+        ),
+        PLUGIN_REGISTRY_PATH=os.path.join(
+            app.instance_path, PLUGIN_REGISTRY_FILE
+        ),
         ADMIN_USERNAMES=frozenset(
             name.strip()
             for name in os.environ.get(ADMIN_USERNAMES_ENV, "").split(",")
@@ -138,6 +147,7 @@ def create_app(test_config: dict | None = None) -> Flask:
 
     register_blueprints(app)
     register_default_nav(app)
+    install_plugins(app)
     app.before_request(enforce_permissions)
     app.add_template_filter(iso_utc)
 

@@ -85,6 +85,7 @@ git push origin known-good-26111015
 - 遵循现有结构：后端保持轻量，只负责存储和 JSON API；Markdown 渲染、代码高亮、图表都在浏览器端完成
 - 新增路由必须用 `@permission_require([...])` 声明所需权限，并把权限名登记到 `nooote/config.py` 的 `PERMISSIONS` 与 `ROLE_PERMISSIONS`；`tests/test_permissions.py` 会检查 `url_map` 中是否有视图漏声明
 - 控制台侧边栏入口通过 `nooote/navigation.py` 的 `register_nav_item(app, NavItem(...))` 注册，不要直接改 `console_base.html`；条目可指定分组、所需权限、排序与统计角标，高亮状态按当前 endpoint 自动判断
+- 插件放入 `plugins/`，每个包导出 `create_plugin()` 并返回 `Plugin`；路由统一挂到 `/plug/<__id>`，插件视图同样必须用 `@permission_require([...])` 声明权限，写法见 [插件](docs/PLUGINS.md)
 - 新增用户可见功能时，同步更新 [AGENTS.md](AGENTS.md) 与 `docs/` 下的相关文档，并补充 pytest 测试
 - 面向用户的文档同时维护中文 `README.md` 和英文 `README.en.md`，改动时保持两边一致
 - 前端第三方库放入 `nooote/static/vendor/`，保留其 LICENSE 并在 vendor README 中登记，不要使用 CDN

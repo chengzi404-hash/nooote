@@ -32,6 +32,10 @@ from .services import current_user
 PUBLIC_ENDPOINTS = frozenset({"static"})
 
 
+def _is_public_endpoint(endpoint: str) -> bool:
+    return endpoint in PUBLIC_ENDPOINTS or endpoint.endswith(".static")
+
+
 def permission_require(permissions: Iterable[str]):
     """Declare the permissions a view needs, e.g. ``["note.read"]``."""
     required = frozenset(permissions)
@@ -84,7 +88,7 @@ def _forbidden():
 def enforce_permissions():
     """Default-deny guard: every endpoint must declare its permissions."""
     endpoint = request.endpoint
-    if endpoint is None or endpoint in PUBLIC_ENDPOINTS:
+    if endpoint is None or _is_public_endpoint(endpoint):
         return None
 
     view = current_app.view_functions.get(endpoint)

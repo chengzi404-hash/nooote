@@ -54,6 +54,7 @@ PERMISSIONS = (
     "settings.write",
     "manage.view",
     "manage.users.write",
+    "plugin.access",
 )
 GUEST_PERMISSIONS = frozenset(
     {"public.view", "auth.access", "language.switch", "files.view"}
@@ -69,6 +70,7 @@ MEMBER_PERMISSIONS = GUEST_PERMISSIONS | {
     "attachment.delete",
     "settings.read",
     "settings.write",
+    "plugin.access",
 }
 ROLE_PERMISSIONS = {
     ROLE_GUEST: GUEST_PERMISSIONS,
@@ -78,6 +80,12 @@ ROLE_PERMISSIONS = {
 
 # Console sidebar: entries beyond this count collapse into "More apps"
 CONSOLE_NAV_VISIBLE_ITEMS = 6
+
+# Plugins: local packages under PLUGINS_FOLDER_NAME, installed lazily at startup
+PLUGINS_FOLDER_NAME = "plugins"
+PLUGIN_REGISTRY_FILE = "plugins.json"
+PLUGIN_ID_BYTES = 8
+PLUGIN_PERMISSION = "plugin.access"
 
 # Notes
 NOTE_ID_BYTES = 6

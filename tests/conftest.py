@@ -14,6 +14,8 @@ def app(tmp_path):
             "TESTING": True,
             "SQLALCHEMY_DATABASE_URI": f"sqlite:///{database}",
             "UPLOAD_FOLDER": (tmp_path / "uploads").as_posix(),
+            "PLUGINS_FOLDER": (tmp_path / "plugins").as_posix(),
+            "PLUGIN_REGISTRY_PATH": (tmp_path / "plugins.json").as_posix(),
         }
     )
     yield app

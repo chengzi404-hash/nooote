@@ -23,7 +23,7 @@
 
 <div align="center">
 
-**Docs**　[Quick start](docs/QUICK_START.md) · [Features & UI](docs/FEATURES.md) · [Markdown extensions](docs/MARKDOWN.md) · [HTTP API](docs/API.md) · [Permission groups](docs/PERMISSIONS.md) · [Configuration](docs/CONFIGURATION.md) · [Project structure](docs/PROJECT_STRUCTURE.md)
+**Docs**　[Quick start](docs/QUICK_START.md) · [Features & UI](docs/FEATURES.md) · [Markdown extensions](docs/MARKDOWN.md) · [HTTP API](docs/API.md) · [Permission groups](docs/PERMISSIONS.md) · [Plugins](docs/PLUGINS.md) · [Configuration](docs/CONFIGURATION.md) · [Project structure](docs/PROJECT_STRUCTURE.md)
 
 **More**　[Contributing](CONTRIBUTING.md) · [Code of conduct](CODE_OF_CONDUCT.md) · [Security](SECURITY.md) · [License](LICENSE) · [中文](README.md)
 
