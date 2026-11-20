@@ -1126,6 +1126,65 @@ input[type="radio"]:focus-visible {
   color: var(--accent-strong);
 }
 
+.nav-more {
+  margin-top: 2px;
+}
+
+.nav-more-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-left: 2px solid transparent;
+  color: var(--muted);
+  font-size: 0.87rem;
+  font-weight: 500;
+  cursor: pointer;
+  list-style: none;
+  transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+}
+
+.nav-more-toggle::-webkit-details-marker {
+  display: none;
+}
+
+.nav-more-toggle:hover {
+  border-left-color: var(--line-strong);
+  background: var(--bg);
+  color: var(--ink);
+}
+
+.nav-more[open] > .nav-more-toggle {
+  color: var(--ink);
+}
+
+.nav-more-count {
+  padding: 0 6px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  line-height: 1.7;
+}
+
+.nav-more-chevron {
+  margin-left: auto;
+  color: var(--muted-2);
+  font-size: 0.7rem;
+  transition: transform 0.18s ease;
+}
+
+.nav-more[open] .nav-more-chevron {
+  transform: rotate(180deg);
+}
+
+.nav-more-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
 .sidebar-panel {
   padding: 14px;
   border: 1px solid var(--line);
@@ -2865,6 +2924,27 @@ fieldset.field legend {
 
   .nav-count {
     margin-left: 4px;
+  }
+
+  .nav-more {
+    flex: 1 1 100%;
+  }
+
+  .nav-more-toggle {
+    padding: 7px 10px;
+    border-left: 0;
+    border-bottom: 2px solid transparent;
+  }
+
+  .nav-more-toggle:hover {
+    border-left-color: transparent;
+    border-bottom-color: var(--line-strong);
+  }
+
+  .nav-more-list {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 4px;
   }
 
   .sidebar-panel {

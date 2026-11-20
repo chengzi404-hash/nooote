@@ -27,6 +27,24 @@
       </a>
       {% endfor %}
       {% endfor %}
+      {% if console_nav_hidden %}
+      <details class="nav-more">
+        <summary class="nav-more-toggle">
+          <i class="fa-solid fa-ellipsis" aria-hidden="true"></i><span>{{ t('console.more_apps') }}</span>
+          <span class="nav-more-count">{{ console_nav_hidden|length }}</span>
+          <i class="fa-solid fa-chevron-down nav-more-chevron" aria-hidden="true"></i>
+        </summary>
+        <div class="nav-more-list">
+          {% for item in console_nav_hidden %}
+          {% set badge = stats[item.count] if item.count and stats is defined and item.count in stats else none %}
+          <a class="nav-link{% if item.active %} is-active{% endif %}" href="{{ item.url }}" data-nav="{{ item.key }}">
+            {% if item.icon.startswith('fa-') %}<i class="{{ item.icon }}" aria-hidden="true"></i>{% else %}{{ icon(item.icon, 17) }}{% endif %}<span>{{ item.label }}</span>
+            {% if badge is not none %}<span class="nav-count">{{ badge }}</span>{% endif %}
+          </a>
+          {% endfor %}
+        </div>
+      </details>
+      {% endif %}
     </nav>
 
     {% if stats is defined %}

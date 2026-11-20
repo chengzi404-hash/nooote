@@ -117,6 +117,42 @@ def test_console_nav_sections_are_grouped(app):
     assert [section["key"] for section in sections] == ["workspace", "account"]
 
 
+def register_extra_items(app, count: int, endpoint: str = "console.settings") -> None:
+    for index in range(count):
+        register_nav_item(
+            app,
+            NavItem(
+                key=f"extra{index}",
+                endpoint=endpoint,
+                label="console.settings",
+                icon="settings",
+            ),
+        )
+
+
+def test_excess_items_collapse_into_more_apps(app, register_client):
+    register_extra_items(app, 3)
+    client = register_client()
+
+    nav = sidebar(client.get("/console").get_data(as_text=True))
+
+    assert '<details class="nav-more">' in nav
+    assert "更多应用" in nav
+    assert '<span class="nav-more-count">1</span>' in nav
+    assert nav.index('data-nav="extra2"') > nav.index('<details class="nav-more">')
+
+
+def test_active_item_is_never_collapsed(app, register_client):
+    register_extra_items(app, 3)
+    client = register_client()
+
+    nav = sidebar(client.get("/console/settings").get_data(as_text=True))
+
+    assert '<details class="nav-more">' not in nav
+    for index in range(3):
+        assert f'data-nav="extra{index}"' in nav
+
+
 def test_duplicate_nav_key_is_rejected(app):
     item = NavItem(
         key="notes",

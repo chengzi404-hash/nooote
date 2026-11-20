@@ -76,6 +76,9 @@ ROLE_PERMISSIONS = {
     ROLE_ADMIN: frozenset(PERMISSIONS),
 }
 
+# Console sidebar: entries beyond this count collapse into "More apps"
+CONSOLE_NAV_VISIBLE_ITEMS = 6
+
 # Notes
 NOTE_ID_BYTES = 6
 NOTE_ID_MAX_LENGTH = 128
