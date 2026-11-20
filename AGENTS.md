@@ -42,6 +42,7 @@ nooote/
 ├── extensions.py        # SQLAlchemy 实例
 ├── models.py            # User（账号、密码哈希与权限组）、Note、Attachment 模型
 ├── permissions.py       # permission_require 装饰器、权限组解析与默认拒绝守卫
+├── navigation.py        # 控制台侧边栏的导航注册表（register_nav_item）
 ├── services.py          # 用户、笔记、附件的领域逻辑
 ├── vendor.py            # vendor 资源清单、SHA-256 校验与自动下载
 ├── blueprints/
@@ -83,6 +84,7 @@ docs/                    # 用户文档：快速开始、功能、Markdown 扩�
 
 - 后端只做存储与 JSON API，不要在服务端新增渲染接口
 - 新增路由必须加 `@permission_require([...])` 声明所需权限，权限名先登记到 `nooote/config.py` 的 `PERMISSIONS` 与 `ROLE_PERMISSIONS`；`tests/test_permissions.py` 会检查整个 `url_map` 是否有视图漏声明
+- 控制台侧边栏入口用 `nooote/navigation.py` 的 `register_nav_item(app, NavItem(...))` 注册，不要直接写进 `console_base.html`；`NavItem` 支持分组、所需权限、排序、统计角标，当前页高亮由 endpoint 自动判断，方便后续插件追加入口
 - 共享常量放进 `nooote/config.py`，避免散落魔法数字
 - 用户可见文案、文档使用中文；终端输出（Banner、日志）使用英文
 - UI 图标统一使用 Font Awesome（`<i class="fa-solid fa-...">`），不使用 emoji 字符

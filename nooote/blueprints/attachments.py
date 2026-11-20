@@ -49,7 +49,6 @@ def index():
         "attachments.html",
         attachments=items,
         stats=console_stats(user.id),
-        active_nav="attachments",
     )
 
 

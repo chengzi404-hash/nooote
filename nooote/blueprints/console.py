@@ -35,7 +35,6 @@ def index():
         "console.html",
         notes=notes,
         stats=console_stats(user.id),
-        active_nav="notes",
     )
 
 
@@ -92,7 +91,6 @@ def settings():
     return render_template(
         "settings.html",
         stats=console_stats(user.id),
-        active_nav="settings",
     )
 
 

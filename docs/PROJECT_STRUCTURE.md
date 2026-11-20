@@ -9,6 +9,7 @@ nooote/
 ├── i18n.py              # 中英文案目录与语言解析
 ├── models.py            # User（账号、密码哈希与权限组）、Note 与 Attachment 模型
 ├── permissions.py       # permission_require 装饰器、权限组与默认拒绝守卫
+├── navigation.py        # 控制台侧边栏的导航注册表（register_nav_item）
 ├── services.py          # 用户、笔记与附件的领域逻辑
 ├── vendor.py            # vendor 资源清单、校验与自动同步
 ├── blueprints/

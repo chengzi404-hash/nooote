@@ -17,28 +17,16 @@
     </form>
 
     <nav class="sidebar-nav">
-      <p class="nav-label">{{ t('console.workspace') }}</p>
-      <a class="nav-link{% if active_nav == 'notes' %} is-active{% endif %}" href="{{ url_for('console.index') }}">
-        {{ icon("notes", 17) }}<span>{{ t('console.my_notes') }}</span>
-        {% if stats is defined %}<span class="nav-count">{{ stats.total }}</span>{% endif %}
+      {% for section in console_nav %}
+      <p class="nav-label">{{ section.label }}</p>
+      {% for item in section.entries %}
+      {% set badge = stats[item.count] if item.count and stats is defined and item.count in stats else none %}
+      <a class="nav-link{% if item.active %} is-active{% endif %}" href="{{ item.url }}" data-nav="{{ item.key }}">
+        {% if item.icon.startswith('fa-') %}<i class="{{ item.icon }}" aria-hidden="true"></i>{% else %}{{ icon(item.icon, 17) }}{% endif %}<span>{{ item.label }}</span>
+        {% if badge is not none %}<span class="nav-count">{{ badge }}</span>{% endif %}
       </a>
-      <a class="nav-link{% if active_nav == 'attachments' %} is-active{% endif %}" href="{{ url_for('attachments.index') }}">
-        {{ icon("image", 17) }}<span>{{ t('console.attachments') }}</span>
-        {% if stats is defined %}<span class="nav-count">{{ stats.attachments }}</span>{% endif %}
-      </a>
-
-      <p class="nav-label">{{ t('console.account') }}</p>
-      {% if 'manage.view' in permissions %}
-      <a class="nav-link{% if active_nav == 'manage' %} is-active{% endif %}" href="{{ url_for('admin.manage') }}">
-        {{ icon("shield", 17) }}<span>{{ t('console.manage') }}</span>
-      </a>
-      {% endif %}
-      <a class="nav-link{% if active_nav == 'settings' %} is-active{% endif %}" href="{{ url_for('console.settings') }}">
-        {{ icon("settings", 17) }}<span>{{ t('console.settings') }}</span>
-      </a>
-      <a class="nav-link" href="{{ url_for('public.index') }}">
-        {{ icon("home", 17) }}<span>{{ t('console.back_home') }}</span>
-      </a>
+      {% endfor %}
+      {% endfor %}
     </nav>
 
     {% if stats is defined %}

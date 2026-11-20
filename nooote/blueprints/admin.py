@@ -30,7 +30,6 @@ def manage():
         },
         stats=console_stats(current_user().id),
         site=site_stats(),
-        active_nav="manage",
     )
 
 

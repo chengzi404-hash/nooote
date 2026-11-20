@@ -23,6 +23,7 @@ from .config import (
 from .extensions import db
 from .i18n import current_locale, html_lang, js_messages, t
 from .models import User, iso_utc
+from .navigation import console_nav, register_default_nav
 from .permissions import enforce_permissions, granted_permissions
 from .vendor import sync_app as sync_vendor_assets
 
@@ -136,6 +137,7 @@ def create_app(test_config: dict | None = None) -> Flask:
     from .blueprints import register_blueprints
 
     register_blueprints(app)
+    register_default_nav(app)
     app.before_request(enforce_permissions)
     app.add_template_filter(iso_utc)
 
@@ -153,6 +155,7 @@ def create_app(test_config: dict | None = None) -> Flask:
             "t": t,
             "js_messages": js_messages(locale),
             "permissions": granted_permissions(user),
+            "console_nav": console_nav(user),
         }
 
     @app.errorhandler(403)
