@@ -2555,6 +2555,19 @@ fieldset.field legend {
   line-height: 1.6;
 }
 
+.feature-flag-group + .feature-flag-group {
+  margin-top: 20px;
+}
+
+.feature-flag-group-title {
+  margin: 0 0 8px;
+  color: var(--muted-2);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
 .role-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));

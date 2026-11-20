@@ -16,6 +16,7 @@ from ..config import (
     USER_ID_BYTES,
 )
 from ..extensions import db
+from ..features import feature_require
 from ..i18n import t
 from ..models import User
 from ..permissions import initial_role, permission_require
@@ -60,6 +61,7 @@ def login():
 
 
 @bp.route("/register", methods=["GET", "POST"])
+@feature_require("registration")
 @permission_require(["auth.access"])
 def register():
     if current_user() is not None:

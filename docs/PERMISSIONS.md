@@ -46,10 +46,11 @@ NOOOTE_ADMIN_USERNAMES=alice,bob uv run flask --app main run
 
 ## 站点管理页
 
-`GET /manage` 需要 `manage.view` 权限（仅 `admin`），包含三块内容：
+`GET /manage` 需要 `manage.view` 权限（仅 `admin`），包含四块内容：
 
 - **站点数据**：账号数、笔记数、公开/私有笔记数、附件数，以及笔记正文与附件的占用空间
 - **权限组**：每组当前账号数与已授予的权限清单，便于核对 `ROLE_PERMISSIONS` 的实际效果
+- **功能开关**：按内置功能与插件分组列出所有 feature flag；`POST /manage/features/<key>` 需要 `manage.features.write`（仅 `admin`）
 - **账号与权限组**：列出全部账号，可把其他账号切换到 `member` / `admin`；`POST /manage/users/<user_id>/role` 需要 `manage.users.write`
 
 站点的语言、主题等个人偏好仍在 `/console/settings`，`/manage` 只处理全站层面的数据与权限。

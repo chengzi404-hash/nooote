@@ -12,9 +12,11 @@
       <span class="sidebar-brand-text">Nooote<small>{{ t('console.brand_subtitle') }}</small></span>
     </a>
 
+    {% if feature_states.notes %}
     <form method="post" action="{{ url_for('console.create_note') }}" class="sidebar-create">
       <button type="submit" class="btn primary block">{{ icon("plus", 16) }} {{ t('console.create_note') }}</button>
     </form>
+    {% endif %}
 
     <nav class="sidebar-nav">
       {% for section in console_nav %}

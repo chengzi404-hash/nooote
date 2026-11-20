@@ -5,6 +5,7 @@ from sqlalchemy import select
 
 from ..config import DEFAULT_THEME, DISPLAY_NAME_MAX_LENGTH, THEMES
 from ..extensions import db
+from ..features import feature_require
 from ..i18n import normalize_locale, set_locale_cookie, t
 from ..models import Note, utcnow
 from ..permissions import permission_require
@@ -19,6 +20,7 @@ bp = Blueprint("console", __name__)
 
 
 @bp.get("/console")
+@feature_require("notes")
 @permission_require(["note.read"])
 def index():
     user = current_user()
@@ -39,6 +41,7 @@ def index():
 
 
 @bp.post("/console/notes")
+@feature_require("notes")
 @permission_require(["note.write"])
 def create_note():
     user = current_user()
@@ -47,6 +50,7 @@ def create_note():
 
 
 @bp.get("/console/notes/<note_id>")
+@feature_require("notes")
 @permission_require(["note.read"])
 def edit_note(note_id: str):
     note = get_owned_note(note_id)
@@ -54,6 +58,7 @@ def edit_note(note_id: str):
 
 
 @bp.post("/console/notes/<note_id>/publish")
+@feature_require(["notes", "public_shares"])
 @permission_require(["note.publish"])
 def publish_note(note_id: str):
     note = get_owned_note(note_id)
@@ -65,6 +70,7 @@ def publish_note(note_id: str):
 
 
 @bp.post("/console/notes/<note_id>/unpublish")
+@feature_require(["notes", "public_shares"])
 @permission_require(["note.publish"])
 def unpublish_note(note_id: str):
     note = get_owned_note(note_id)
@@ -76,6 +82,7 @@ def unpublish_note(note_id: str):
 
 
 @bp.post("/console/notes/<note_id>/delete")
+@feature_require("notes")
 @permission_require(["note.delete"])
 def delete_note(note_id: str):
     note = get_owned_note(note_id)

@@ -6,8 +6,9 @@ nooote/
 ├── __init__.py          # 应用工厂、配置加载、安全响应头
 ├── config.py            # 配置默认值与共享常量
 ├── extensions.py        # SQLAlchemy 实例
+├── features.py          # feature flag 注册、持久化、路由守卫与管理页数据
 ├── i18n.py              # 中英文案目录与语言解析
-├── models.py            # User（账号、密码哈希与权限组）、Note 与 Attachment 模型
+├── models.py            # User（账号、密码哈希与权限组）、Note、Attachment 与 FeatureFlag 模型
 ├── permissions.py       # permission_require 装饰器、权限组与默认拒绝守卫
 ├── navigation.py        # 控制台侧边栏的导航注册表（register_nav_item）
 ├── plugins.py           # 本地插件发现、安装 ID 持久化与 /plug/<__id> 挂载

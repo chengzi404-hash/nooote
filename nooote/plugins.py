@@ -29,6 +29,13 @@ from .config import (
     PLUGIN_ID_BYTES,
     PLUGIN_PERMISSION,
 )
+from .features import (
+    PLUGIN_BLUEPRINT_FEATURES,
+    Feature,
+    plugin_feature_key,
+    register_feature,
+    register_feature_group,
+)
 from .navigation import NavItem, register_nav_item
 
 PLUGIN_EXTENSION = "plugins"
@@ -59,6 +66,7 @@ class Plugin:
     order: int = 100
     permission: str | None = PLUGIN_PERMISSION
     nav: bool = True
+    features: tuple[Feature, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -162,6 +170,13 @@ def _load_plugin(path: Path) -> Plugin:
         raise PluginError(f"{path.name} must not set a blueprint url_prefix")
     if plugin.permission is not None and plugin.permission not in PERMISSIONS:
         raise PluginError(f"{path.name} declares unknown permission")
+    if not all(isinstance(feature, Feature) for feature in plugin.features):
+        raise PluginError(f"{path.name} features must be Feature instances")
+    local_keys = [feature.key for feature in plugin.features]
+    if any(not key for key in local_keys):
+        raise PluginError(f"{path.name} declares an empty feature key")
+    if len(set(local_keys)) != len(local_keys):
+        raise PluginError(f"{path.name} declares duplicate feature keys")
     return plugin
 
 
@@ -213,6 +228,27 @@ def _mount_plugin(app: Flask, plugin: Plugin, plugin_id: str) -> None:
             f"{plugin.name} has no view endpoint {plugin.endpoint!r}"
         )
 
+    master = plugin_feature_key(plugin.name)
+    register_feature_group(app, plugin.name, plugin.label)
+    register_feature(
+        app,
+        Feature(master, plugin.label, plugin.description),
+    )
+    for feature in plugin.features:
+        register_feature(
+            app,
+            Feature(
+                plugin_feature_key(plugin.name, feature.key),
+                feature.label,
+                feature.description,
+                feature.default,
+                group=plugin.name,
+            ),
+        )
+    app.extensions.setdefault(PLUGIN_BLUEPRINT_FEATURES, {})[
+        plugin.blueprint.name
+    ] = master
+
     if not plugin.nav:
         return
     register_nav_item(
@@ -224,6 +260,7 @@ def _mount_plugin(app: Flask, plugin: Plugin, plugin_id: str) -> None:
             icon=plugin.icon,
             group="workspace",
             permission=plugin.permission,
+            feature=master,
             order=plugin.order,
         ),
     )

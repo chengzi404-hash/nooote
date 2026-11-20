@@ -260,6 +260,23 @@ MESSAGES: dict[str, dict[str, str]] = {
         "manage.self_role": "不能修改自己的权限组",
         "manage.role_updated": "已更新 {username} 的权限组",
         "manage.error_self_role": "不能修改自己的权限组，请让其他管理员操作",
+        "manage.features_title": "功能开关",
+        "manage.features_lead": "关闭后，对应路由与侧边栏入口立即停用；插件功能也可以单独开关。",
+        "manage.features_core": "默认功能",
+        "manage.feature_on": "已开启",
+        "manage.feature_off": "已关闭",
+        "manage.feature_enable": "开启",
+        "manage.feature_disable": "关闭",
+        "manage.feature_updated": "已将「{name}」设置为{state}",
+        # ---------- feature flags ----------
+        "features.notes.label": "笔记",
+        "features.notes.description": "私有笔记列表、编辑器与保存接口",
+        "features.attachments.label": "图床与附件",
+        "features.attachments.description": "附件上传、管理与编辑器中插入图片；已上传文件仍可访问",
+        "features.public_shares.label": "公开分享",
+        "features.public_shares.description": "公开/取消公开、只读分享页与首页的公开笔记列表",
+        "features.registration.label": "开放注册",
+        "features.registration.description": "允许访客创建新账号；关闭后已有账号仍可登录",
         # ---------- attachments ----------
         "attachments.page_title": "图床与附件 · Nooote",
         "attachments.crumb": "图床与附件",
@@ -358,6 +375,10 @@ MESSAGES: dict[str, dict[str, str]] = {
         "error.forbidden_title": "403 · Nooote",
         "error.forbidden_heading": "没有访问权限",
         "error.forbidden_body": "当前账号所在的权限组不包含访问该页面的权限。",
+        "error.feature_disabled": "该功能已被关闭",
+        "error.feature_disabled_title": "403 · Nooote",
+        "error.feature_disabled_heading": "功能已关闭",
+        "error.feature_disabled_body": "该功能已被管理员关闭，如需使用请联系站点管理员。",
         "error.back_home": "返回首页",
         "upload.file_required": "请选择要上传的文件",
         "upload.file_too_large": "文件过大，超出上传上限",
@@ -643,6 +664,35 @@ MESSAGES: dict[str, dict[str, str]] = {
         "manage.error_self_role": (
             "You cannot change your own permission group; ask another administrator."
         ),
+        "manage.features_title": "Feature flags",
+        "manage.features_lead": (
+            "Disabling a feature immediately stops its routes and sidebar entry. "
+            "Plugin features can be toggled independently."
+        ),
+        "manage.features_core": "Built-in features",
+        "manage.feature_on": "On",
+        "manage.feature_off": "Off",
+        "manage.feature_enable": "Enable",
+        "manage.feature_disable": "Disable",
+        "manage.feature_updated": "Set {name} to {state}",
+        # ---------- feature flags ----------
+        "features.notes.label": "Notes",
+        "features.notes.description": (
+            "Private note list, editor, and saving API"
+        ),
+        "features.attachments.label": "Files & images",
+        "features.attachments.description": (
+            "Uploads, attachment management, and editor images; existing files "
+            "stay reachable"
+        ),
+        "features.public_shares.label": "Public shares",
+        "features.public_shares.description": (
+            "Publishing, read-only share pages, and the public note list on the home page"
+        ),
+        "features.registration.label": "Registration",
+        "features.registration.description": (
+            "Allow visitors to create accounts; existing accounts can still log in"
+        ),
         # ---------- attachments ----------
         "attachments.page_title": "Files & images · Nooote",
         "attachments.crumb": "Files & images",
@@ -745,6 +795,13 @@ MESSAGES: dict[str, dict[str, str]] = {
         "error.forbidden_heading": "Access denied",
         "error.forbidden_body": (
             "The permission group on your account does not include access to this page."
+        ),
+        "error.feature_disabled": "This feature is disabled",
+        "error.feature_disabled_title": "403 · Nooote",
+        "error.feature_disabled_heading": "Feature disabled",
+        "error.feature_disabled_body": (
+            "An administrator turned this feature off. Contact the site "
+            "administrator if you need it enabled."
         ),
         "error.back_home": "Back to home",
         "upload.file_required": "Choose a file to upload",

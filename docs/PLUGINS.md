@@ -53,6 +53,7 @@ def create_plugin():
 | `order` | `100` | 侧边栏排序，与内置菜单共用 |
 | `permission` | `plugin.access` | 侧边栏可见所需权限；`None` 表示不检查 |
 | `nav` | `True` | 设成 `False` 时不注册侧边栏入口 |
+| `features` | `()` | 插件自带的子功能开关，见下文 |
 
 ## 路由与安装 ID
 
@@ -69,6 +70,39 @@ def create_plugin():
 插件路由同样受默认拒绝守卫约束，必须用 `@permission_require([...])` 声明权限。插件页面面向登录用户时使用 `plugin.access`（`member` 与 `admin` 都拥有）；如需更严格的权限，先在 `nooote/config.py` 中登记新权限并分配到权限组。
 
 未声明的插件视图会被全局守卫拦下，`tests/test_permissions.py` 也会检查 `url_map` 中的每个视图。
+
+## 功能开关
+
+每个插件会自动获得一个总开关 `plugin.<插件名>`（关闭后插件所有页面不可访问、侧边栏入口隐藏）。插件还可以用 `Plugin.features` 声明更细的子功能开关，核心会命名空间化为 `plugin.<插件名>.<key>`，管理员在 `GET /manage` 的「功能开关」中分别启停。
+
+```python
+from nooote.features import Feature, feature_require, plugin_feature_key
+
+WIDGETS = plugin_feature_key("hello", "widgets")
+
+
+def create_plugin():
+    bp = Blueprint("hello", __name__)
+
+    @bp.route("/widgets")
+    @permission_require(["plugin.access"])
+    @feature_require(WIDGETS)
+    def widgets():
+        ...
+
+    return Plugin(
+        name="hello",
+        label="Hello",
+        blueprint=bp,
+        features=(
+            Feature("widgets", "Widgets", "额外的组件页面"),
+        ),
+    )
+```
+
+- `Feature` 的 `label` / `description` 会经过 i18n 目录，插件直接写文本即可原样显示
+- 被关闭的功能统一返回 `403`：`/api/**` 返回 JSON，页面显示「功能已关闭」
+- 子功能默认开启；关闭某个子功能只影响声明了它的视图，不会影响插件总开关和其他页面
 
 ## 模板与静态资源
 

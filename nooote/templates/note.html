@@ -28,13 +28,17 @@
     {% if note.is_public %}
     <a class="btn small subtle note-public-link" href="{{ url_for('public.share_note', note_id=note.id) }}" target="_blank" rel="noreferrer">{{ t('editor.view') }} {{ icon("external", 12) }}</a>
     <button type="button" class="btn small subtle note-copy-link" data-copy="{{ url_for('public.share_note', note_id=note.id) }}">{{ t('editor.copy_link') }}</button>
+    {% if feature_states.public_shares %}
     <form method="post" action="{{ url_for('console.unpublish_note', note_id=note.id) }}">
       <button type="submit" class="btn small subtle">{{ t('editor.unpublish') }}</button>
     </form>
+    {% endif %}
     {% else %}
+    {% if feature_states.public_shares %}
     <form method="post" action="{{ url_for('console.publish_note', note_id=note.id) }}">
       <button type="submit" class="btn small subtle">{{ t('editor.publish') }}</button>
     </form>
+    {% endif %}
     {% endif %}
     <span class="status" data-status data-state="saved">{{ t('editor.saved') }}</span>
     <span class="saved-at">{{ t('editor.updated') }} <time data-saved-at data-relative datetime="{{ note.updated_at|iso_utc }}">{{ note.updated_at|iso_utc }}</time></span>
@@ -66,12 +70,16 @@
       <span class="toolbar-divider" aria-hidden="true"></span>
       <div class="toolbar-group">
         <button type="button" class="tool-btn" data-md-action="link" aria-label="{{ t('editor.link') }}" title="{{ t('editor.link') }}"><i class="fa-solid fa-link" aria-hidden="true"></i></button>
+        {% if feature_states.attachments %}
         <button type="button" class="tool-btn" data-upload-trigger aria-label="{{ t('editor.upload') }}" title="{{ t('editor.upload') }}"><i class="fa-solid fa-image" aria-hidden="true"></i></button>
+        {% endif %}
         <button type="button" class="tool-btn" data-md-action="code-block" aria-label="{{ t('editor.code_block') }}" title="{{ t('editor.code_block') }}"><i class="fa-solid fa-file-code" aria-hidden="true"></i></button>
         <button type="button" class="tool-btn" data-md-action="table" aria-label="{{ t('editor.table') }}" title="{{ t('editor.table') }}"><i class="fa-solid fa-table" aria-hidden="true"></i></button>
         <button type="button" class="tool-btn" data-md-action="divider" aria-label="{{ t('editor.divider') }}" title="{{ t('editor.divider') }}"><i class="fa-solid fa-minus" aria-hidden="true"></i></button>
         <button type="button" class="tool-btn" data-md-action="formula" aria-label="{{ t('editor.formula') }}" title="{{ t('editor.formula') }}"><i class="fa-solid fa-square-root-variable" aria-hidden="true"></i></button>
+        {% if feature_states.attachments %}
         <input type="file" data-upload-input hidden multiple>
+        {% endif %}
       </div>
     </div>
     <textarea id="editor" aria-labelledby="editor-label" spellcheck="true"

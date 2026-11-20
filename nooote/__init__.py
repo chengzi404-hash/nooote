@@ -23,6 +23,12 @@ from .config import (
     USER_ID_MAX_LENGTH,
 )
 from .extensions import db
+from .features import (
+    enforce_features,
+    feature_states,
+    register_default_features,
+    validate_feature_wiring,
+)
 from .i18n import current_locale, html_lang, js_messages, t
 from .models import User, iso_utc
 from .navigation import console_nav_view, register_default_nav
@@ -146,9 +152,12 @@ def create_app(test_config: dict | None = None) -> Flask:
     from .blueprints import register_blueprints
 
     register_blueprints(app)
+    register_default_features(app)
     register_default_nav(app)
     install_plugins(app)
+    validate_feature_wiring(app)
     app.before_request(enforce_permissions)
+    app.before_request(enforce_features)
     app.add_template_filter(iso_utc)
 
     @app.context_processor
@@ -166,6 +175,7 @@ def create_app(test_config: dict | None = None) -> Flask:
             "t": t,
             "js_messages": js_messages(locale),
             "permissions": granted_permissions(user),
+            "feature_states": feature_states(),
             "console_nav": nav["sections"],
             "console_nav_hidden": nav["hidden"],
         }

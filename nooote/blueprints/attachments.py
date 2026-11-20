@@ -15,6 +15,7 @@ from sqlalchemy import select
 
 from ..config import ATTACHMENT_CACHE_SECONDS, ATTACHMENT_ID_RE
 from ..extensions import db
+from ..features import feature_require
 from ..i18n import t
 from ..models import Attachment
 from ..permissions import permission_require
@@ -33,6 +34,7 @@ bp = Blueprint("attachments", __name__)
 
 
 @bp.get("/console/attachments")
+@feature_require("attachments")
 @permission_require(["attachment.read"])
 def index():
     user = current_user()
@@ -53,6 +55,7 @@ def index():
 
 
 @bp.post("/console/attachments")
+@feature_require("attachments")
 @permission_require(["attachment.write"])
 def upload():
     try:
@@ -66,6 +69,7 @@ def upload():
 
 
 @bp.post("/console/attachments/<attachment_id>/delete")
+@feature_require("attachments")
 @permission_require(["attachment.delete"])
 def delete_attachment(attachment_id: str):
     attachment = get_owned_attachment(attachment_id)
@@ -80,6 +84,7 @@ def delete_attachment(attachment_id: str):
 
 
 @bp.post("/api/console/attachments")
+@feature_require("attachments")
 @permission_require(["attachment.write"])
 def api_upload():
     try:
@@ -103,6 +108,7 @@ def api_upload():
 
 
 @bp.delete("/api/console/attachments/<attachment_id>")
+@feature_require("attachments")
 @permission_require(["attachment.delete"])
 def api_delete_attachment(attachment_id: str):
     attachment = get_owned_attachment(attachment_id)

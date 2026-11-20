@@ -9,7 +9,7 @@ from nooote.config import (
     ROLE_PERMISSIONS,
 )
 from nooote.extensions import db
-from nooote.models import Note, User
+from nooote.models import User
 from nooote.permissions import granted_permissions, initial_role, permission_require
 
 PASSWORD = "password123"

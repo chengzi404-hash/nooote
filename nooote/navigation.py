@@ -17,6 +17,7 @@ from dataclasses import dataclass
 from flask import Flask, current_app, has_request_context, request, url_for
 
 from .config import CONSOLE_NAV_VISIBLE_ITEMS, PERMISSIONS
+from .features import FEATURE_REGISTRY, feature_enabled
 from .i18n import t
 from .permissions import granted_permissions
 
@@ -45,6 +46,7 @@ class NavItem:
     group: str = "workspace"
     permission: str | None = None
     count: str | None = None
+    feature: str | None = None
     order: int = DEFAULT_ORDER
 
 
@@ -56,6 +58,7 @@ DEFAULT_NAV_ITEMS = (
         "notes",
         order=10,
         count="total",
+        feature="notes",
     ),
     NavItem(
         "attachments",
@@ -64,6 +67,7 @@ DEFAULT_NAV_ITEMS = (
         "image",
         order=20,
         count="attachments",
+        feature="attachments",
     ),
     NavItem(
         "manage",
@@ -99,6 +103,9 @@ def register_nav_item(app: Flask, item: NavItem) -> NavItem:
         raise ValueError(f"unknown nav group: {item.group}")
     if item.permission is not None and item.permission not in PERMISSIONS:
         raise ValueError(f"unknown permission: {item.permission}")
+    features = app.extensions.get(FEATURE_REGISTRY, {})
+    if item.feature is not None and item.feature not in features:
+        raise ValueError(f"unknown feature: {item.feature}")
     if item.endpoint not in app.view_functions:
         raise ValueError(f"unknown endpoint: {item.endpoint}")
 
@@ -133,6 +140,8 @@ def console_nav_view(user=None) -> dict[str, object]:
         key=lambda item: item.order,
     ):
         if item.permission is not None and item.permission not in granted:
+            continue
+        if item.feature is not None and not feature_enabled(item.feature):
             continue
         entries.append(
             {

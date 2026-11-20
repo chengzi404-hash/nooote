@@ -14,8 +14,9 @@
 - 用户系统：注册、登录、退出，密码以 Werkzeug 哈希存储
 - 权限组：`guest` / `member` / `admin`，定义在 `nooote/config.py` 的 `ROLE_PERMISSIONS`；每个路由都用 `@permission_require([...])` 声明所需权限，由 `nooote/permissions.py` 的应用级 `before_request` 统一校验，未声明的视图默认拒绝
 - 权限不足时：`/api/**` 返回 JSON `401` / `403`，页面请求重定向到登录页或渲染 403 提示页；管理员在 `GET /manage` 调整其他账号的权限组（不能改自己）并查看站点数据
+- 功能开关：内置 `notes` / `attachments` / `public_shares` / `registration` 与插件功能均由 `nooote/features.py` 注册，管理员在 `GET /manage` 启停；路由用 `@feature_require([...])` 声明依赖，关闭后路由与侧边栏入口立即停用
 - 注册默认获得 `member`；`NOOOTE_ADMIN_USERNAMES`（逗号分隔）中的用户名注册后直接获得 `admin`
-- 插件：`plugins/` 下的本地包在启动时自动发现，首次安装生成并持久化 `__id`，蓝图统一挂到 `/plug/<__id>`，并自动注册侧边栏入口；详见 [docs/PLUGINS.md](docs/PLUGINS.md)
+- 插件：`plugins/` 下的本地包在启动时自动发现，首次安装生成并持久化 `__id`，蓝图统一挂到 `/plug/<__id>`，并自动注册侧边栏入口；插件可声明 `Plugin.features` 拆分子功能开关；详见 [docs/PLUGINS.md](docs/PLUGINS.md)
 - 控制台：`GET /console` 管理当前账号的私有笔记，`GET /console/settings` 设置昵称、主题（跟随系统/浅色/深色）与新笔记默认公开
 - 图床与附件：`GET /console/attachments` 上传、复制链接、删除；编辑器内支持点击上传、拖拽或粘贴图片并自动插入 Markdown
 - 附件通过 `/files/<id>` 访问，图片内联显示、其他文件下载；链接不可猜测，但拿到链接即可访问
@@ -41,7 +42,8 @@ nooote/
 ├── __init__.py          # 应用工厂、配置加载、安全响应头、启动时同步 vendor
 ├── config.py            # Config 默认值与共享常量（长度限制、正则、选项元组）
 ├── extensions.py        # SQLAlchemy 实例
-├── models.py            # User（账号、密码哈希与权限组）、Note、Attachment 模型
+├── features.py          # feature flag 注册、持久化、路由守卫与管理页数据
+├── models.py            # User（账号、密码哈希与权限组）、Note、Attachment、FeatureFlag 模型
 ├── permissions.py       # permission_require 装饰器、权限组解析与默认拒绝守卫
 ├── navigation.py        # 控制台侧边栏的导航注册表（register_nav_item）
 ├── plugins.py           # 本地插件发现、安装 ID 持久化与 /plug/<__id> 挂载
@@ -87,6 +89,7 @@ plugins/                 # 本地插件目录：每个子包导出 create_plugin
 
 - 后端只做存储与 JSON API，不要在服务端新增渲染接口
 - 新增路由必须加 `@permission_require([...])` 声明所需权限，权限名先登记到 `nooote/config.py` 的 `PERMISSIONS` 与 `ROLE_PERMISSIONS`；`tests/test_permissions.py` 会检查整个 `url_map` 是否有视图漏声明
+- 功能路由还必须用 `@feature_require([...])` 声明所属 feature flag；内置开关登记在 `nooote/features.py` 的 `DEFAULT_FEATURES`，插件子开关登记在 `Plugin.features`，侧边栏用 `NavItem.feature` 绑定同一个开关
 - 控制台侧边栏入口用 `nooote/navigation.py` 的 `register_nav_item(app, NavItem(...))` 注册，不要直接写进 `console_base.html`；`NavItem` 支持分组、所需权限、排序、统计角标，当前页高亮由 endpoint 自动判断，方便后续插件追加入口
 - 插件放在 `plugins/` 下，每个包导出 `create_plugin()` 返回 `nooote.plugins.Plugin`；首次安装时自动生成并持久化 `__id`，蓝图统一挂到 `/plug/<__id>`，插件路由同样必须声明权限；详见 [docs/PLUGINS.md](docs/PLUGINS.md)
 - 共享常量放进 `nooote/config.py`，避免散落魔法数字

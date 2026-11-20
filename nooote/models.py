@@ -9,6 +9,7 @@ from .config import (
     DEFAULT_LOCALE,
     DEFAULT_ROLE,
     DISPLAY_NAME_MAX_LENGTH,
+    FEATURE_KEY_MAX_LENGTH,
     FILENAME_MAX_LENGTH,
     LOCALE_MAX_LENGTH,
     NOTE_ID_MAX_LENGTH,
@@ -98,4 +99,18 @@ class Note(db.Model):
     )
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, default=utcnow, onupdate=utcnow, index=True
+    )
+
+
+class FeatureFlag(db.Model):
+    """Persisted override for a registered feature flag."""
+
+    __tablename__ = "feature_flags"
+
+    key: Mapped[str] = mapped_column(
+        String(FEATURE_KEY_MAX_LENGTH), primary_key=True
+    )
+    enabled: Mapped[bool] = mapped_column(Boolean, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, default=utcnow, onupdate=utcnow
     )

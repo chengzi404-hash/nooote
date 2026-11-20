@@ -5,6 +5,11 @@ from sqlalchemy import select
 
 from ..config import ROLES, ROLE_PERMISSIONS
 from ..extensions import db
+from ..features import (
+    feature_groups_view,
+    get_feature,
+    set_feature_enabled,
+)
 from ..i18n import t
 from ..models import User
 from ..permissions import permission_require
@@ -30,6 +35,7 @@ def manage():
         },
         stats=console_stats(current_user().id),
         site=site_stats(),
+        feature_groups=feature_groups_view(),
     )
 
 
@@ -51,4 +57,24 @@ def update_role(user_id: str):
     target.role = role
     db.session.commit()
     flash(t("manage.role_updated", username=target.username), "ok")
+    return redirect(url_for("admin.manage"))
+
+
+@bp.post("/manage/features/<feature_key>")
+@permission_require(["manage.features.write"])
+def toggle_feature(feature_key: str):
+    feature = get_feature(feature_key)
+    if feature is None:
+        abort(404)
+
+    enabled = request.form.get("enabled") == "1"
+    set_feature_enabled(feature.key, enabled)
+    flash(
+        t(
+            "manage.feature_updated",
+            name=t(feature.label),
+            state=t("manage.feature_on" if enabled else "manage.feature_off"),
+        ),
+        "ok",
+    )
     return redirect(url_for("admin.manage"))

@@ -5,6 +5,7 @@ from sqlalchemy import select
 
 from ..config import RECENT_NOTES_LIMIT
 from ..extensions import db
+from ..features import feature_require
 from ..models import Note
 from ..permissions import permission_require
 from ..services import get_public_note, is_valid_note_id, random_public_note_id
@@ -33,6 +34,7 @@ def index():
 
 
 @bp.get("/share/<note_id>")
+@feature_require("public_shares")
 @permission_require(["public.view"])
 def share_note(note_id: str):
     note = get_public_note(note_id)
@@ -40,6 +42,7 @@ def share_note(note_id: str):
 
 
 @bp.get("/world")
+@feature_require("public_shares")
 @permission_require(["public.view"])
 def world_lookup():
     note_id = (request.args.get("id") or "").strip()
@@ -49,6 +52,7 @@ def world_lookup():
 
 
 @bp.get("/world/<note_id>")
+@feature_require("public_shares")
 @permission_require(["public.view"])
 def world_note(note_id: str):
     if not is_valid_note_id(note_id):

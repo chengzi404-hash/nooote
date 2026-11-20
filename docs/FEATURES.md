@@ -5,7 +5,8 @@
 - `GET /console`：我的控制台，管理当前账号的私有笔记
 - 用户系统：注册、登录、退出，密码使用 Werkzeug 哈希存储；控制台、设置、笔记 API 与附件管理均需登录
 - 权限组：`guest` / `member` / `admin` 三组，每个路由都用 `@permission_require([...])` 声明所需权限，由服务端统一校验、默认拒绝；管理员可在 `GET /manage` 调整其他账号的权限组
-- `GET /manage`：站点管理页，展示账号、笔记、附件与占用空间等站点数据，并可分配权限组
+- `GET /manage`：站点管理页，展示账号、笔记、附件与占用空间等站点数据，可分配权限组，并通过 feature flag 启停内置功能与插件功能
+- 功能开关覆盖 `notes`、`attachments`、`public_shares`、`registration`；插件另有总开关与任意子功能开关，关闭后对应路由与侧边栏入口立即停用
 - `GET /console/settings`：用户设置，可设置昵称、外观主题（跟随系统/浅色/深色）与新笔记默认公开
 - `GET /console/attachments`：图床与附件管理，可上传、复制链接和删除文件
 - 编辑器内支持点击上传、拖拽或粘贴图片，自动插入 Markdown 图片或附件链接

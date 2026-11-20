@@ -56,6 +56,40 @@
   </p>
 </section>
 
+<section class="manage-section" aria-labelledby="manage-features-title">
+  <h2 id="manage-features-title" class="manage-section-title">{{ t('manage.features_title') }}</h2>
+  <p class="manage-note">{{ t('manage.features_lead') }}</p>
+  {% for group in feature_groups %}
+  <div class="feature-flag-group">
+    <h3 class="feature-flag-group-title">{{ group.label }}</h3>
+    <ul class="note-list">
+      {% for feature in group.features %}
+      <li class="note-row">
+        <div class="note-main">
+          <span class="note-title">{{ feature.label }}</span>
+          <span class="note-meta">
+            <code>{{ feature.key }}</code>
+            {% if feature.description %}<span aria-hidden="true">·</span> {{ feature.description }}{% endif %}
+          </span>
+        </div>
+        <div class="note-actions">
+          <span class="badge {% if feature.enabled %}public{% else %}private{% endif %}">
+            {{ t('manage.feature_on') if feature.enabled else t('manage.feature_off') }}
+          </span>
+          <form method="post" action="{{ url_for('admin.toggle_feature', feature_key=feature.key) }}">
+            <input type="hidden" name="enabled" value="{{ '0' if feature.enabled else '1' }}">
+            <button type="submit" class="btn small outline">
+              {{ t('manage.feature_disable') if feature.enabled else t('manage.feature_enable') }}
+            </button>
+          </form>
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endfor %}
+</section>
+
 <section class="manage-section" aria-labelledby="manage-roles-title">
   <h2 id="manage-roles-title" class="manage-section-title">{{ t('manage.groups_title') }}</h2>
   <p class="manage-note">{{ t('manage.groups_lead') }}</p>

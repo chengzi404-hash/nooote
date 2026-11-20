@@ -11,6 +11,12 @@
 
 笔记内容上限为 256 KiB（`MAX_NOTE_BYTES`），请求体上限为 10 MiB。默认配置与共享常量集中在 `nooote/config.py`，可在应用工厂中覆盖。
 
+## 功能开关
+
+内置功能与插件都可以通过 feature flag 启停：管理员在 `GET /manage` 的「功能开关」区域切换，立即生效，无需重启。内置开关为 `notes`、`attachments`、`public_shares`、`registration`；插件自动获得 `plugin.<插件名>` 总开关，并可在 `Plugin.features` 中声明 `plugin.<插件名>.<key>` 子开关。开关覆盖值保存在数据库的 `feature_flags` 表，默认值定义在 `nooote/features.py`。
+
+路由用 `@feature_require([...])` 声明依赖，侧边栏条目的 `NavItem.feature` 也会自动隐藏。关闭后页面返回 `403` 并显示「功能已关闭」，`/api/**` 返回 `403` JSON。
+
 ## 插件
 
 插件从项目根目录的 `plugins/` 自动发现，安装时生成的 `__id` 保存在 `instance/plugins.json`。应用工厂中可用 `PLUGINS_FOLDER` 与 `PLUGIN_REGISTRY_PATH` 覆盖这两个位置（测试会指向临时目录）。插件页面对登录用户开放，依赖 `plugin.access` 权限。写法见 [插件](PLUGINS.md)。

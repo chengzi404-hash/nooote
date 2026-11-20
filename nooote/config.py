@@ -54,6 +54,7 @@ PERMISSIONS = (
     "settings.write",
     "manage.view",
     "manage.users.write",
+    "manage.features.write",
     "plugin.access",
 )
 GUEST_PERMISSIONS = frozenset(
@@ -86,6 +87,9 @@ PLUGINS_FOLDER_NAME = "plugins"
 PLUGIN_REGISTRY_FILE = "plugins.json"
 PLUGIN_ID_BYTES = 8
 PLUGIN_PERMISSION = "plugin.access"
+
+# Feature flags: keys are stored in the feature_flags table
+FEATURE_KEY_MAX_LENGTH = 128
 
 # Notes
 NOTE_ID_BYTES = 6

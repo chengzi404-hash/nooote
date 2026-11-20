@@ -2,6 +2,7 @@
 
 from flask import Blueprint, jsonify, url_for
 
+from ..features import feature_require
 from ..i18n import t
 from ..models import iso_utc
 from ..permissions import permission_require
@@ -18,6 +19,7 @@ bp = Blueprint("notes_api", __name__)
 
 
 @bp.get("/api/console/notes/<note_id>")
+@feature_require("notes")
 @permission_require(["note.read"])
 def api_get_owned_note(note_id: str):
     if not is_valid_note_id(note_id):
@@ -35,6 +37,7 @@ def api_get_owned_note(note_id: str):
 
 
 @bp.put("/api/console/notes/<note_id>")
+@feature_require("notes")
 @permission_require(["note.write"])
 def api_save_owned_note(note_id: str):
     if not is_valid_note_id(note_id):
@@ -60,6 +63,7 @@ def api_save_owned_note(note_id: str):
 
 
 @bp.get("/api/share/<note_id>")
+@feature_require("public_shares")
 @permission_require(["public.view"])
 def api_get_public_note(note_id: str):
     if not is_valid_note_id(note_id):
